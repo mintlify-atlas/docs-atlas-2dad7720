@@ -1,0 +1,223 @@
+---
+title: Presets
+description: Learn how presets work in PM-Auto and when to create new ones
+---
+
+A preset is a reusable tech stack configuration that defines a collection of packages to install together. Presets let you standardize your development environment and share configurations across projects and teams.
+
+## What is a preset?
+
+A preset is a named configuration that includes:
+
+- A **preset name** that identifies the configuration
+- An optional **description** explaining what the preset does
+- A **package manager** to use for installation (npm, pnpm, yarn, or bun)
+- A **packages array** listing all packages to install and how to install them
+
+When you run `pm-auto install <preset-name>`, PM-Auto reads the preset configuration, translates it to the appropriate package manager commands, and executes them in the correct order.
+
+## Anatomy of a preset
+
+Here's the TypeScript interface that defines a preset:
+
+```typescript
+interface ConfigType {
+  presetName: string;
+  description?: string;
+  packageManager: string;
+  packages: {
+    command: string;
+    interactive: boolean;
+    dev?: boolean;
+    flags?: string[];
+    version?: string;
+  }[];
+}
+```
+
+### Field breakdown
+
+<AccordionGroup>
+  <Accordion title="presetName">
+    A unique identifier for your preset. This is the name you'll use when running `pm-auto install <preset-name>`.
+    
+    **Required**: Yes  
+    **Type**: `string`  
+    **Example**: `"example"`, `"react-starter"`, `"fullstack-nextjs"`
+  </Accordion>
+
+  <Accordion title="description">
+    A human-readable explanation of what the preset installs and who it's for.
+    
+    **Required**: No  
+    **Type**: `string`  
+    **Example**: `"A sample configuration demonstrating all options for PM-Auto"`
+  </Accordion>
+
+  <Accordion title="packageManager">
+    The package manager to use for installing packages. Must be one of: `npm`, `pnpm`, `yarn`, or `bun`.
+    
+    **Required**: Yes  
+    **Type**: `string`  
+    **Example**: `"bun"`, `"pnpm"`
+  </Accordion>
+
+  <Accordion title="packages">
+    An array of package configurations. Each package specifies what to install and how to install it.
+    
+    **Required**: Yes  
+    **Type**: `Array<PackageType>`  
+    
+    See [Configuration](/concepts/configuration) for detailed package field documentation.
+  </Accordion>
+</AccordionGroup>
+
+## How presets work internally
+
+When you install a preset, PM-Auto processes it in three steps:
+
+### 1. Command separation
+
+PM-Auto separates packages into two categories:
+
+- **Interactive packages**: Packages with `"interactive": true` that require user input (like `create-next-app` or `shadcn init`)
+- **Non-interactive packages**: Packages with `"interactive": false` that install without prompts
+
+### 2. Command batching
+
+Non-interactive packages are batched into a single install command for efficiency:
+
+```bash
+# Instead of running 3 separate commands:
+bun add gsap@3.11.4 --peer-deps
+bun add @react-three/fiber
+bun add clsx
+
+# PM-Auto batches them into one:
+bun add gsap@3.11.4 --peer-deps @react-three/fiber clsx
+```
+
+Interactive packages are run sequentially as separate commands.
+
+### 3. Package manager translation
+
+PM-Auto translates your preset configuration to the correct commands for your chosen package manager. The same preset works across all supported package managers.
+
+<Info>
+  PM-Auto handles differences between package managers automatically, including dev flags (`-D` vs `-d`) and run commands (`npx` vs `bunx` vs `pnpm dlx`).
+</Info>
+
+## Real-world example
+
+Here's a complete preset from the PM-Auto source:
+
+```json
+{
+  "example": {
+    "presetName": "example",
+    "description": "A sample configuration demonstrating all options for PM-Auto",
+    "packageManager": "bun",
+    "packages": [
+      {
+        "command": "create-next-app",
+        "interactive": true,
+        "dev": false,
+        "version": "latest",
+        "flags": ["."]
+      },
+      {
+        "command": "shadcn",
+        "interactive": true,
+        "dev": false,
+        "version": "latest",
+        "flags": ["init"]
+      },
+      {
+        "command": "gsap",
+        "interactive": false,
+        "dev": false,
+        "version": "3.11.4",
+        "flags": ["--peer-deps"]
+      },
+      {
+        "command": "@react-three/fiber",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "clsx",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "@types/three",
+        "interactive": false,
+        "dev": true
+      }
+    ]
+  }
+}
+```
+
+This preset:
+
+1. Runs `bunx create-next-app@latest .` (interactive)
+2. Runs `bunx shadcn@latest init` (interactive)
+3. Installs `gsap`, `@react-three/fiber`, `clsx`, and `@types/three` in one batched command
+
+## When to create a new preset
+
+Create a new preset when you:
+
+- Have a repeatable tech stack you use across multiple projects
+- Want to onboard new team members with a standardized setup
+- Need to document your preferred package versions and configurations
+- Want to share a working configuration with the community
+
+### Examples of good presets:
+
+- `"nextjs-tailwind-shadcn"` - A Next.js starter with styling libraries
+- `"react-testing"` - Testing tools for React projects
+- `"express-api"` - Backend API with Express and common middleware
+- `"typescript-node"` - TypeScript configuration for Node.js projects
+
+## When to modify an existing preset
+
+Modify an existing preset when you:
+
+- Need to update package versions
+- Want to add or remove packages from an established workflow
+- Need to adjust flags or installation options
+- Discover a better package that replaces an existing one
+
+<Warning>
+  If you're modifying a preset that others depend on, consider creating a new preset version (e.g., `"react-starter-v2"`) instead of changing the original.
+</Warning>
+
+## Multiple presets in one file
+
+You can define multiple presets in your `config.json` file. Each preset is a top-level key:
+
+```json
+{
+  "example": {
+    "presetName": "example",
+    "packageManager": "bun",
+    "packages": []
+  },
+  "react-starter": {
+    "presetName": "react-starter",
+    "packageManager": "npm",
+    "packages": []
+  },
+  "fullstack": {
+    "presetName": "fullstack",
+    "packageManager": "pnpm",
+    "packages": []
+  }
+}
+```
+
+<Note>
+  The top-level JSON key and the `presetName` field should match to avoid confusion.
+</Note>

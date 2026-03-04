@@ -1,0 +1,178 @@
+---
+title: pm-auto config
+description: Set the path to your PM-Auto configuration file
+---
+
+## Usage
+
+```bash
+pm-auto config <path>
+```
+
+## What it does
+
+The `config` command saves the path to your PM-Auto configuration file in `~/.pm-auto/settings.json`. This path is used by all other PM-Auto commands to read your preset definitions.
+
+When you run this command, PM-Auto will:
+
+1. Create the `~/.pm-auto` directory if it doesn't exist
+2. Resolve the provided path to an absolute path
+3. Save the path to `~/.pm-auto/settings.json`
+4. Prepend an example preset to your config file (if not already present)
+
+<Warning>
+  You must run `pm-auto config <path>` after creating or moving your config file. All other commands will fail without a valid config path.
+</Warning>
+
+## Examples
+
+### Set config with relative path
+
+```bash
+pm-auto config ./pm-auto.json
+```
+
+```
+┌  pm-auto 
+│
+◇  Config file path saved: ./pm-auto.json
+◇  Prepending example to file: /Users/username/projects/myapp/pm-auto.json
+◇  Example prepended successfully
+```
+
+### Set config with absolute path
+
+```bash
+pm-auto config /Users/username/projects/myapp/pm-auto.json
+```
+
+```
+┌  pm-auto 
+│
+◇  Config file path saved: /Users/username/projects/myapp/pm-auto.json
+◇  Prepending example to file: /Users/username/projects/myapp/pm-auto.json
+◇  Example prepended successfully
+```
+
+### Set config in home directory
+
+```bash
+pm-auto config ~/pm-auto.json
+```
+
+```
+┌  pm-auto 
+│
+◇  Config file path saved: ~/pm-auto.json
+◇  Prepending example to file: /Users/username/pm-auto.json
+◇  Example prepended successfully
+```
+
+## Example preset
+
+When you run `pm-auto config`, an example preset is automatically added to your config file:
+
+```json
+{
+  "example": {
+    "presetName": "example",
+    "description": "A sample configuration demonstrating all options for PM-Auto",
+    "packageManager": "bun",
+    "packages": [
+      {
+        "command": "create-next-app",
+        "interactive": true,
+        "dev": false,
+        "version": "latest",
+        "flags": ["."]
+      },
+      {
+        "command": "shadcn",
+        "interactive": true,
+        "dev": false,
+        "version": "latest",
+        "flags": ["init"]
+      },
+      {
+        "command": "gsap",
+        "interactive": false,
+        "dev": false,
+        "version": "3.11.4",
+        "flags": ["--peer-deps"]
+      },
+      {
+        "command": "@react-three/fiber",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "clsx",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "@types/three",
+        "interactive": false,
+        "dev": true
+      }
+    ]
+  }
+}
+```
+
+You can use this as a template for creating your own presets.
+
+## Where the config is stored
+
+Your config path is stored in:
+
+```
+~/.pm-auto/settings.json
+```
+
+The file looks like this:
+
+```json
+{
+  "configPath": "/Users/username/projects/myapp/pm-auto.json"
+}
+```
+
+## Updating the config path
+
+If you move your config file or want to use a different config file, simply run the command again:
+
+```bash
+pm-auto config ./new-location/pm-auto.json
+```
+
+<Note>
+  The config path is resolved to an absolute path using Node.js `fs.realpathSync()`, so relative paths will be converted to absolute paths.
+</Note>
+
+## Error handling
+
+If the file doesn't exist at the provided path:
+
+```bash
+pm-auto config ./non-existent.json
+```
+
+```
+┌  pm-auto 
+│
+✖  Error saving config file: ENOENT: no such file or directory
+```
+
+Make sure to create the file first:
+
+```bash
+touch pm-auto.json
+pm-auto config ./pm-auto.json
+```
+
+## Related commands
+
+- [`pm-auto config-path`](/commands/config-path) - Display the current config path
+- [`pm-auto list`](/commands/list) - List all presets in your config
+- [`pm-auto describe`](/commands/describe) - View details about a preset

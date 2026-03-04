@@ -1,0 +1,373 @@
+---
+title: Preset examples
+description: Real-world preset configurations for common development workflows
+---
+
+Learn from these real-world preset examples. Each one is production-ready and solves a common development workflow.
+
+## Frontend frameworks
+
+<AccordionGroup>
+  <Accordion title="Vite + React">
+    A minimal Vite + React setup with TypeScript support.
+    
+    ```json config.json
+    {
+      "vite-react": {
+        "presetName": "vite-react",
+        "description": "Vite + React with TypeScript",
+        "packageManager": "npm",
+        "packages": [
+          {
+            "command": "react react-dom",
+            "interactive": false
+          },
+          {
+            "command": "@types/react @types/react-dom",
+            "interactive": false,
+            "dev": true
+          },
+          {
+            "command": "vite @vitejs/plugin-react",
+            "interactive": false,
+            "dev": true
+          },
+          {
+            "command": "typescript",
+            "interactive": false,
+            "dev": true
+          }
+        ]
+      }
+    }
+    ```
+    
+    **Use case:** Starting a new React project with Vite as the build tool.
+    
+    **Install:**
+    ```bash
+    pm-auto install vite-react
+    ```
+  </Accordion>
+  
+  <Accordion title="Next.js + Tailwind CSS">
+    Complete Next.js setup with Tailwind CSS and TypeScript.
+    
+    ```json config.json
+    {
+      "next-tailwind": {
+        "presetName": "next-tailwind",
+        "description": "Next.js with Tailwind CSS and TypeScript",
+        "packageManager": "npm",
+        "packages": [
+          {
+            "command": "create-next-app",
+            "interactive": true,
+            "flags": [".", "--typescript", "--tailwind", "--app"]
+          },
+          {
+            "command": "clsx tailwind-merge",
+            "interactive": false
+          }
+        ]
+      }
+    }
+    ```
+    
+    **Use case:** Starting a new Next.js project with Tailwind CSS styling utilities.
+    
+    **Install:**
+    ```bash
+    mkdir my-next-app && cd my-next-app
+    pm-auto install next-tailwind
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Backend & API
+
+<AccordionGroup>
+  <Accordion title="Express + TypeScript API">
+    Production-ready Express API with TypeScript and essential middleware.
+    
+    ```json config.json
+    {
+      "express-api": {
+        "presetName": "express-api",
+        "description": "Express + TypeScript backend with middleware",
+        "packageManager": "npm",
+        "packages": [
+          {
+            "command": "express dotenv cors helmet morgan",
+            "interactive": false
+          },
+          {
+            "command": "@types/express @types/cors @types/morgan",
+            "interactive": false,
+            "dev": true
+          },
+          {
+            "command": "typescript ts-node @types/node",
+            "interactive": false,
+            "dev": true
+          },
+          {
+            "command": "nodemon",
+            "interactive": false,
+            "dev": true
+          }
+        ]
+      }
+    }
+    ```
+    
+    **What's included:**
+    - `express` - Web framework
+    - `dotenv` - Environment variables
+    - `cors` - CORS middleware
+    - `helmet` - Security headers
+    - `morgan` - HTTP logging
+    - TypeScript with type definitions
+    - `nodemon` for development
+    
+    **Install:**
+    ```bash
+    pm-auto install express-api
+    ```
+  </Accordion>
+  
+  <Accordion title="Fastify + TypeScript">
+    High-performance Fastify server with TypeScript.
+    
+    ```json config.json
+    {
+      "fastify-api": {
+        "presetName": "fastify-api",
+        "description": "Fastify + TypeScript for fast APIs",
+        "packageManager": "pnpm",
+        "packages": [
+          {
+            "command": "fastify @fastify/cors @fastify/helmet",
+            "interactive": false
+          },
+          {
+            "command": "typescript @types/node",
+            "interactive": false,
+            "dev": true
+          },
+          {
+            "command": "tsx",
+            "interactive": false,
+            "dev": true
+          }
+        ]
+      }
+    }
+    ```
+    
+    **Use case:** Building high-performance REST APIs with Fastify.
+    
+    **Install:**
+    ```bash
+    pm-auto install fastify-api
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## 3D & Animation
+
+<AccordionGroup>
+  <Accordion title="Three.js + React">
+    Complete setup for creating 3D web experiences with Three.js and React.
+    
+    ```json config.json
+    {
+      "threejs-react": {
+        "presetName": "threejs-react",
+        "description": "Three.js + React for 3D web experiences",
+        "packageManager": "pnpm",
+        "packages": [
+          {
+            "command": "three @react-three/fiber @react-three/drei",
+            "interactive": false
+          },
+          {
+            "command": "@types/three",
+            "interactive": false,
+            "dev": true
+          },
+          {
+            "command": "gsap leva",
+            "interactive": false
+          }
+        ]
+      }
+    }
+    ```
+    
+    **What's included:**
+    - `three` - Three.js core library
+    - `@react-three/fiber` - React renderer for Three.js
+    - `@react-three/drei` - Useful helpers and abstractions
+    - `gsap` - Animation library
+    - `leva` - GUI controls for tweaking values
+    
+    **Install:**
+    ```bash
+    pm-auto install threejs-react
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Testing
+
+<AccordionGroup>
+  <Accordion title="Vitest + Testing Library">
+    Modern testing setup with Vitest and React Testing Library.
+    
+    ```json config.json
+    {
+      "test-setup": {
+        "presetName": "test-setup",
+        "description": "Vitest + React Testing Library",
+        "packageManager": "npm",
+        "packages": [
+          {
+            "command": "vitest @vitest/ui",
+            "interactive": false,
+            "dev": true
+          },
+          {
+            "command": "@testing-library/react @testing-library/jest-dom @testing-library/user-event",
+            "interactive": false,
+            "dev": true
+          },
+          {
+            "command": "jsdom",
+            "interactive": false,
+            "dev": true
+          }
+        ]
+      }
+    }
+    ```
+    
+    **Use case:** Adding testing to an existing React project.
+    
+    **Install:**
+    ```bash
+    pm-auto install test-setup
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## UI Libraries
+
+<AccordionGroup>
+  <Accordion title="Shadcn UI + Next.js">
+    Shadcn UI component library with Next.js.
+    
+    ```json config.json
+    {
+      "shadcn-next": {
+        "presetName": "shadcn-next",
+        "description": "Next.js with Shadcn UI components",
+        "packageManager": "bun",
+        "packages": [
+          {
+            "command": "create-next-app",
+            "interactive": true,
+            "flags": ["."]
+          },
+          {
+            "command": "shadcn",
+            "interactive": true,
+            "flags": ["init"]
+          },
+          {
+            "command": "clsx tailwind-merge",
+            "interactive": false
+          }
+        ]
+      }
+    }
+    ```
+    
+    **Use case:** Creating a Next.js app with Shadcn UI pre-configured.
+    
+    **Install:**
+    ```bash
+    mkdir my-app && cd my-app
+    pm-auto install shadcn-next
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Database & ORM
+
+<AccordionGroup>
+  <Accordion title="Prisma + PostgreSQL">
+    Prisma ORM setup for PostgreSQL databases.
+    
+    ```json config.json
+    {
+      "prisma-postgres": {
+        "presetName": "prisma-postgres",
+        "description": "Prisma ORM with PostgreSQL",
+        "packageManager": "npm",
+        "packages": [
+          {
+            "command": "@prisma/client",
+            "interactive": false
+          },
+          {
+            "command": "prisma",
+            "interactive": false,
+            "dev": true
+          }
+        ]
+      }
+    }
+    ```
+    
+    **What to do after install:**
+    ```bash
+    npx prisma init
+    # Edit .env and schema.prisma
+    npx prisma migrate dev
+    ```
+    
+    **Install:**
+    ```bash
+    pm-auto install prisma-postgres
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Tips for using these examples
+
+<Tip>
+  Copy any of these examples into your `config.json`, then customize them for your needs. You can:
+  - Change the package manager
+  - Add or remove packages
+  - Pin specific versions
+  - Add custom flags
+</Tip>
+
+<Note>
+  Remember to register your config file after making changes:
+  ```bash
+  pm-auto config ./config.json
+  ```
+</Note>
+
+## What's next?
+
+<CardGroup cols={2}>
+  <Card title="Creating presets" icon="wrench" href="/guides/creating-presets">
+    Learn how to create your own presets from scratch
+  </Card>
+  <Card title="Best practices" icon="star" href="/guides/best-practices">
+    Tips for writing maintainable presets
+  </Card>
+</CardGroup>

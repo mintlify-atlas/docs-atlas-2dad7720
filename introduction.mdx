@@ -1,0 +1,84 @@
+---
+title: Introduction
+description: Learn what PM-Auto is and how it helps you define and install tech stack presets with one command.
+---
+
+## What is PM-Auto?
+
+PM-Auto is a CLI tool that lets you define reusable package presets and install them anywhere with a single command. It eliminates the need to repeatedly type out or copy-paste long installation commands when setting up similar projects.
+
+If you regularly set up the same kind of projects, PM-Auto saves real time.
+
+## The problem PM-Auto solves
+
+Most developers do this every time they start a new project:
+
+```bash
+npm install react react-dom
+npm install -D @types/react @types/react-dom
+npm install vite @vitejs/plugin-react
+npm install three @react-three/fiber gsap
+```
+
+With PM-Auto, you define this stack once in a config file, then reuse it forever:
+
+```bash
+pm-auto install vite-react
+```
+
+Done.
+
+## Key features
+
+**Reusable presets**  
+Define your common tech stacks once and install them anywhere. Each preset contains all the packages you need for a specific project type.
+
+**Multi-package manager support**  
+Works with npm, pnpm, yarn, and bun. Specify which package manager to use per preset.
+
+**Version pinning**  
+Lock packages to specific versions or use `latest` to always get the newest version.
+
+**Interactive command support**  
+Run interactive installers like `create-next-app` or `shadcn init` as part of your preset.
+
+**Dev dependency control**  
+Specify which packages should be installed as dev dependencies.
+
+**Custom flags**  
+Add package-specific flags or CLI arguments to fine-tune installations.
+
+**Dry run mode**  
+Preview all commands before execution with the `--dry-run` flag.
+
+## When to use PM-Auto
+
+PM-Auto is ideal if you:
+
+- Set up the same project types repeatedly (e.g., Next.js apps, Three.js experiments, Express APIs)
+- Want to standardize your team's tech stack configurations
+- Need to remember exact package versions across projects
+- Want to automate the initial setup of new projects
+- Frequently onboard new developers who need consistent environments
+
+## How it works
+
+PM-Auto is built around **presets**. A preset is:
+
+- A name (e.g., `vite`, `next`, `threejs-react`)
+- A package manager (`npm`, `pnpm`, `yarn`, or `bun`)
+- An ordered list of packages to install
+- Optional configuration like versions, flags, and dev dependencies
+
+You store presets in a JSON config file. PM-Auto reads that file and executes the installation commands for you.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Install PM-Auto globally via npm, pnpm, or yarn
+  </Card>
+  <Card title="Quick start" icon="rocket" href="/quickstart">
+    Create your first preset and install it in under 5 minutes
+  </Card>
+</CardGroup>

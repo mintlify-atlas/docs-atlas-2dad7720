@@ -1,0 +1,270 @@
+---
+title: Package managers
+description: Understand how PM-Auto supports npm, pnpm, yarn, and bun
+---
+
+PM-Auto supports all major JavaScript package managers. When you define a preset, you specify which package manager to use, and PM-Auto automatically translates your configuration to the correct commands.
+
+## Supported package managers
+
+PM-Auto supports four package managers:
+
+<CardGroup cols={2}>
+  <Card title="npm" icon="npm">
+    The default Node.js package manager, included with every Node.js installation.
+  </Card>
+  <Card title="pnpm" icon="box">
+    A fast, disk-efficient package manager that uses a content-addressable store.
+  </Card>
+  <Card title="yarn" icon="yarn">
+    A popular alternative to npm with improved performance and security features.
+  </Card>
+  <Card title="bun" icon="bolt">
+    A modern JavaScript runtime with a built-in ultra-fast package manager.
+  </Card>
+</CardGroup>
+
+## Command mapping
+
+PM-Auto maps your preset configuration to package manager-specific commands. Here's how each manager translates common operations:
+
+### Install commands
+
+| Operation | npm | pnpm | yarn | bun |
+|-----------|-----|------|------|-----|
+| Install package | `npm install` | `pnpm add` | `yarn add` | `bun add` |
+| Run package | `npx` | `pnpm dlx` | `yarn dlx` | `bunx` |
+| Dev flag | `-D` | `-D` | `-D` | `-d` |
+
+### Implementation details
+
+Here's the exact command mapping from PM-Auto's source code:
+
+```typescript
+const commandPrefixes = {
+  npm: {
+    install: "npm install",
+    run: "npx",
+    dev: "-D",
+  },
+  pnpm: {
+    install: "pnpm add",
+    run: "pnpm dlx",
+    dev: "-D",
+  },
+  yarn: {
+    install: "yarn add",
+    run: "yarn dlx",
+    dev: "-D",
+  },
+  bun: {
+    install: "bun add",
+    run: "bunx",
+    dev: "-d",
+  },
+};
+```
+
+<Note>
+  Notice that bun uses `-d` for dev dependencies instead of `-D`. PM-Auto handles this difference automatically.
+</Note>
+
+### Uninstall commands
+
+| Operation | npm | pnpm | yarn | bun |
+|-----------|-----|------|------|-----|
+| Remove package | `npm uninstall` | `pnpm remove` | `yarn remove` | `bun remove` |
+
+## How PM-Auto translates commands
+
+When you run `pm-auto install`, PM-Auto processes your preset and generates the appropriate commands for your chosen package manager.
+
+### Example: Installing non-interactive packages
+
+Given this preset configuration:
+
+```json
+{
+  "presetName": "example",
+  "packageManager": "pnpm",
+  "packages": [
+    {
+      "command": "gsap",
+      "interactive": false,
+      "version": "3.11.4",
+      "flags": ["--peer-deps"]
+    },
+    {
+      "command": "clsx",
+      "interactive": false
+    },
+    {
+      "command": "@types/node",
+      "interactive": false,
+      "dev": true
+    }
+  ]
+}
+```
+
+PM-Auto generates:
+
+```bash
+pnpm add gsap@3.11.4 --peer-deps clsx @types/node -D
+```
+
+### Example: Running interactive packages
+
+For interactive packages (like project scaffolding tools), PM-Auto uses the package manager's run command:
+
+```json
+{
+  "command": "create-next-app",
+  "interactive": true,
+  "version": "latest",
+  "flags": ["."]
+}
+```
+
+Generates different commands per manager:
+
+<CodeGroup>
+```bash npm
+npx create-next-app@latest .
+```
+
+```bash pnpm
+pnpm dlx create-next-app@latest .
+```
+
+```bash yarn
+yarn dlx create-next-app@latest .
+```
+
+```bash bun
+bunx create-next-app@latest .
+```
+</CodeGroup>
+
+## Choosing the right package manager
+
+When creating a preset, consider these factors:
+
+### Speed
+
+**Fastest**: bun > pnpm > yarn > npm
+
+If installation speed is critical (especially for CI/CD), consider bun or pnpm.
+
+### Compatibility
+
+**Most compatible**: npm
+
+Npm has the broadest compatibility with legacy projects and tools. If you need maximum compatibility, use npm.
+
+### Disk space
+
+**Most efficient**: pnpm
+
+Pnpm uses a global store and hard links, saving significant disk space when you have multiple projects.
+
+### Team considerations
+
+Choose the package manager your team already uses. Consistency matters more than marginal performance differences.
+
+<Warning>
+  Don't mix package managers in a single project. Stick with one manager per project to avoid lockfile conflicts and inconsistent dependencies.
+</Warning>
+
+## Same preset, different package managers
+
+You can create multiple versions of the same preset for different package managers. This is useful when sharing presets across teams with different preferences.
+
+### Example: React starter presets
+
+<CodeGroup>
+```json npm preset
+{
+  "react-starter-npm": {
+    "presetName": "react-starter-npm",
+    "description": "React starter kit using npm",
+    "packageManager": "npm",
+    "packages": [
+      {
+        "command": "create-vite",
+        "interactive": true,
+        "flags": ["."]
+      },
+      {
+        "command": "react-router-dom",
+        "interactive": false
+      }
+    ]
+  }
+}
+```
+
+```json pnpm preset
+{
+  "react-starter-pnpm": {
+    "presetName": "react-starter-pnpm",
+    "description": "React starter kit using pnpm",
+    "packageManager": "pnpm",
+    "packages": [
+      {
+        "command": "create-vite",
+        "interactive": true,
+        "flags": ["."]
+      },
+      {
+        "command": "react-router-dom",
+        "interactive": false
+      }
+    ]
+  }
+}
+```
+
+```json bun preset
+{
+  "react-starter-bun": {
+    "presetName": "react-starter-bun",
+    "description": "React starter kit using bun",
+    "packageManager": "bun",
+    "packages": [
+      {
+        "command": "create-vite",
+        "interactive": true,
+        "flags": ["."]
+      },
+      {
+        "command": "react-router-dom",
+        "interactive": false
+      }
+    ]
+  }
+}
+```
+</CodeGroup>
+
+The packages and configuration are identical—only the `packageManager` field changes. PM-Auto handles all the command translation.
+
+## Package manager detection
+
+PM-Auto uses the `packageManager` field in your preset to determine which commands to generate. It doesn't automatically detect which package manager is installed or used in the current project.
+
+<Info>
+  If you specify a package manager that isn't installed on your system, the commands will fail. Make sure the package manager specified in your preset is available in your environment.
+</Info>
+
+## Fallback behavior
+
+If you specify an unsupported package manager, PM-Auto falls back to npm:
+
+```typescript
+const manager =
+  commandPrefixes[packageManager as keyof typeof commandPrefixes] ||
+  commandPrefixes.npm;
+```
+
+This ensures your preset will still work, even if the package manager name is mistyped or unsupported.

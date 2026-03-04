@@ -1,0 +1,143 @@
+---
+title: pm-auto install
+description: Install packages using your detected package manager with predefined presets from your config file
+---
+
+## Usage
+
+```bash
+pm-auto install [packages...]
+```
+
+**Aliases:** `add`, `i`
+
+You can use any of these commands interchangeably:
+
+```bash
+pm-auto install next-stack
+pm-auto add next-stack
+pm-auto i next-stack
+```
+
+## What it does
+
+When you run `pm-auto install`, the tool:
+
+1. Reads your configuration file to find the specified preset(s)
+2. Detects your package manager (npm, pnpm, yarn, or bun)
+3. Executes interactive commands first (like `create-next-app` or `shadcn init`)
+4. Batches and installs all non-interactive packages in a single command
+5. Reports installation time and success status
+
+If you don't specify any packages, it will install all presets defined in your config file.
+
+## Options
+
+<ParamField path="--add-flags" type="string" default="none">
+  Add custom flags to the already defined flags from your config file. Use `-A` as a shorthand.
+  
+  ```bash
+  pm-auto install next-stack --add-flags="--legacy-peer-deps"
+  pm-auto i next-stack -A "--save-exact"
+  ```
+</ParamField>
+
+<ParamField path="--dry-run" type="boolean" default="false">
+  Display all commands that would be executed without actually running them. Use `-D` as a shorthand. After displaying the commands, you'll be prompted to continue or cancel.
+  
+  ```bash
+  pm-auto install next-stack --dry-run
+  pm-auto i next-stack -D
+  ```
+</ParamField>
+
+## Examples
+
+### Install a single preset
+
+```bash
+pm-auto install next-stack
+```
+
+```
+┌  pm-auto 
+│
+◇  Installing packages... next-stack
+◇  Running interactive command: npx create-next-app@latest .
+◇  Running command: npm install gsap@3.11.4 --peer-deps @react-three/fiber clsx
+◇  Running command: npm install @types/three -D
+◇  Done!
+◇  Installation took 45s
+◇  Packages installed successfully
+```
+
+### Install multiple presets
+
+```bash
+pm-auto install next-stack ui-components
+```
+
+### Install all presets from config
+
+```bash
+pm-auto install
+```
+
+### Dry run to preview commands
+
+```bash
+pm-auto install next-stack --dry-run
+```
+
+```
+┌  pm-auto 
+│
+◇  Installing packages... next-stack
+◇  Dry Run:
+◇  Package name -> next-stack
+◇  running create-next-app
+◇  running shadcn
+◇  running gsap
+◇  running @react-three/fiber
+◇  running clsx
+◇  running @types/three
+◆  Continue?
+│  Yes
+```
+
+### Add custom flags to all packages
+
+```bash
+pm-auto install next-stack --add-flags="--legacy-peer-deps"
+```
+
+## Error handling
+
+If a preset is not found in your config file:
+
+```bash
+pm-auto install non-existent
+```
+
+```
+⚠  Package 'non-existent' not found in config
+✖  No configuration found
+```
+
+<Note>
+  If the config file path is not set or the file doesn't exist, you'll be prompted to run `pm-auto config <path>` to set it up.
+</Note>
+
+## Interactive vs non-interactive packages
+
+**Interactive packages** (like `create-next-app` or `shadcn init`) run sequentially and allow you to interact with prompts.
+
+**Non-interactive packages** are batched into a single install command for efficiency. For example:
+
+```bash
+npm install gsap@3.11.4 @react-three/fiber clsx @types/three -D
+```
+
+<Warning>
+  The install command will exit if any command fails. Check your terminal output for error details.
+</Warning>

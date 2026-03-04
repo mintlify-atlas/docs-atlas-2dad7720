@@ -1,80 +1,380 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick start
+description: Create your first PM-Auto preset and install it in under 5 minutes.
 ---
 
-## Get started in three steps
+This guide walks you through creating a preset, registering it, and installing packages with PM-Auto.
 
-Get your documentation site running locally and make your first customization.
+<Steps>
 
-### Step 1: Set up your local environment
+<Step title="Install PM-Auto">
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+If you haven't already, install PM-Auto globally:
 
-### Step 2: Deploy your changes
+<CodeGroup>
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
+```bash npm
+npm install -g pm-auto
+```
+
+```bash pnpm
+pnpm add -g pm-auto
+```
+
+```bash yarn
+yarn global add pm-auto
+```
+
+</CodeGroup>
+
+Verify the installation:
+
+```bash
+pm-auto -V
+```
+
+</Step>
+
+<Step title="Create a config file">
+
+Create a `config.json` file in your preferred location (e.g., your home directory or a dotfiles repo):
+
+```json config.json
+{
+  "vite-react": {
+    "presetName": "vite-react",
+    "description": "Vite + React + TypeScript setup",
+    "packageManager": "npm",
+    "packages": [
+      {
+        "command": "vite",
+        "interactive": false,
+        "dev": true
+      },
+      {
+        "command": "@vitejs/plugin-react",
+        "interactive": false,
+        "dev": true
+      },
+      {
+        "command": "react",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "react-dom",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "@types/react",
+        "interactive": false,
+        "dev": true
+      },
+      {
+        "command": "@types/react-dom",
+        "interactive": false,
+        "dev": true
+      }
+    ]
+  }
+}
+```
+
+<Accordion title="Config structure explained">
+
+- **`vite-react`**: Internal key (can be anything unique)
+- **`presetName`**: Name you'll use in the CLI (`pm-auto install vite-react`)
+- **`description`**: Shows up when you run `pm-auto list --desc`
+- **`packageManager`**: Which package manager to use (`npm`, `pnpm`, `yarn`, or `bun`)
+- **`packages`**: Array of packages to install in order
+  - **`command`**: Package name
+  - **`interactive`**: Set to `true` for interactive installers (e.g., `create-next-app`)
+  - **`dev`**: Set to `true` to install as a dev dependency
+  - **`version`** (optional): Specify a version like `"3.11.4"` or `"latest"`
+  - **`flags`** (optional): Additional CLI flags like `["--legacy-peer-deps"]`
+
 </Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+</Step>
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+<Step title="Register your config path">
 
-### Step 3: Go live
+Tell PM-Auto where to find your config file:
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+```bash
+pm-auto config ./config.json
+```
 
-## Next steps
+<Warning>
+  You must register the config path before using PM-Auto. If you move your config file or edit its location, run this command again with the new path.
+</Warning>
 
-Now that you have your docs running, explore these key features:
+Verify the config path was saved:
 
-<CardGroup cols={2}>
+```bash
+pm-auto config-path
+```
 
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
+Output:
 
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
+```bash
+Config Path: /Users/yourname/config.json
+```
 
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
+</Step>
 
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
+<Step title="Install your preset">
 
-</CardGroup>
+Navigate to an empty project directory and install your preset:
+
+```bash
+mkdir my-vite-app
+cd my-vite-app
+pm-auto install vite-react
+```
+
+PM-Auto will execute each package installation in order:
+
+```bash
+┌  pm-auto
+│
+◇  Installing preset: vite-react
+│
+◆  Running: npm install vite --save-dev
+│  added 23 packages, and audited 24 packages in 3s
+│
+◆  Running: npm install @vitejs/plugin-react --save-dev
+│  added 8 packages, and audited 32 packages in 2s
+│
+◆  Running: npm install react
+│  added 3 packages, and audited 35 packages in 1s
+│
+◆  Running: npm install react-dom
+│  added 1 package, and audited 36 packages in 1s
+│
+◆  Running: npm install @types/react --save-dev
+│  added 1 package, and audited 37 packages in 1s
+│
+◆  Running: npm install @types/react-dom --save-dev
+│  added 1 package, and audited 38 packages in 1s
+│
+└  ✓ All packages installed successfully
+```
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  You can use the `--dry-run` flag to preview commands without executing them: `pm-auto install vite-react --dry-run`
 </Note>
+
+</Step>
+
+<Step title="Verify installation">
+
+Check that all packages were installed:
+
+```bash
+cat package.json
+```
+
+You should see all your dependencies listed:
+
+```json package.json
+{
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.5"
+  }
+}
+```
+
+</Step>
+
+</Steps>
+
+## What's next?
+
+Now that you've created your first preset, you can:
+
+**Add more presets**  
+Add additional presets to your `config.json` for different project types (Next.js, Express, Three.js, etc.).
+
+**Use advanced features**  
+Explore version pinning, custom flags, and interactive commands to build more complex presets.
+
+**Share your config**  
+Commit your `config.json` to a dotfiles repo or share it with your team for consistent setups.
+
+**List available presets**  
+See all your configured presets:
+
+```bash
+pm-auto list
+```
+
+**View preset details**  
+Inspect a specific preset:
+
+```bash
+pm-auto describe vite-react
+```
+
+## Common patterns
+
+Here are some example presets you might want to create:
+
+<AccordionGroup>
+
+<Accordion title="Next.js with Tailwind">
+
+```json
+{
+  "next-tailwind": {
+    "presetName": "next-tailwind",
+    "description": "Next.js with Tailwind CSS",
+    "packageManager": "npm",
+    "packages": [
+      {
+        "command": "create-next-app",
+        "interactive": true,
+        "dev": false,
+        "flags": ["."]
+      },
+      {
+        "command": "tailwindcss",
+        "interactive": false,
+        "dev": true
+      },
+      {
+        "command": "postcss",
+        "interactive": false,
+        "dev": true
+      },
+      {
+        "command": "autoprefixer",
+        "interactive": false,
+        "dev": true
+      }
+    ]
+  }
+}
+```
+
+</Accordion>
+
+<Accordion title="Three.js with React">
+
+```json
+{
+  "threejs-react": {
+    "presetName": "threejs-react",
+    "description": "Three.js with React Three Fiber",
+    "packageManager": "pnpm",
+    "packages": [
+      {
+        "command": "three",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "@react-three/fiber",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "@react-three/drei",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "@types/three",
+        "interactive": false,
+        "dev": true
+      },
+      {
+        "command": "gsap",
+        "interactive": false,
+        "dev": false,
+        "version": "3.11.4"
+      }
+    ]
+  }
+}
+```
+
+</Accordion>
+
+<Accordion title="Express API with TypeScript">
+
+```json
+{
+  "express-api": {
+    "presetName": "express-api",
+    "description": "Express API with TypeScript",
+    "packageManager": "npm",
+    "packages": [
+      {
+        "command": "express",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "dotenv",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "cors",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "helmet",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "typescript",
+        "interactive": false,
+        "dev": true
+      },
+      {
+        "command": "ts-node",
+        "interactive": false,
+        "dev": true
+      },
+      {
+        "command": "@types/node",
+        "interactive": false,
+        "dev": true
+      },
+      {
+        "command": "@types/express",
+        "interactive": false,
+        "dev": true
+      },
+      {
+        "command": "@types/cors",
+        "interactive": false,
+        "dev": true
+      }
+    ]
+  }
+}
+```
+
+</Accordion>
+
+</AccordionGroup>
+
+## Tips
+
+- Keep preset names short and memorable (`vite`, `next`, `api`)
+- Group packages you always install together
+- Use the `--dry-run` flag to test presets before running them
+- Commit your `config.json` to version control for easy sharing

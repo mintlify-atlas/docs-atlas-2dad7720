@@ -1,0 +1,103 @@
+---
+title: pm-auto describe
+description: Display detailed information about a specific preset from your configuration file
+---
+
+## Usage
+
+```bash
+pm-auto describe <package>
+```
+
+**Alias:** `desc`
+
+You can use either command:
+
+```bash
+pm-auto describe next-stack
+pm-auto desc next-stack
+```
+
+## What it does
+
+The `describe` command reads your configuration file and displays the description for a specific preset. This helps you understand what a preset contains before installing it.
+
+## Examples
+
+### Describe a preset
+
+```bash
+pm-auto describe next-stack
+```
+
+```
+┌  pm-auto 
+│
+◇  next-stack - Next.js app with shadcn/ui, GSAP, and React Three Fiber
+```
+
+### When a preset has no description
+
+```bash
+pm-auto describe my-preset
+```
+
+```
+┌  pm-auto 
+│
+◇  my-preset - No description
+```
+
+### Describe multiple presets
+
+You can run the command multiple times to check several presets:
+
+```bash
+pm-auto desc next-stack
+pm-auto desc ui-components
+pm-auto desc testing-suite
+```
+
+```
+┌  pm-auto 
+│
+◇  next-stack - Next.js app with shadcn/ui, GSAP, and React Three Fiber
+
+┌  pm-auto 
+│
+◇  ui-components - Shadcn/ui components with Tailwind and Radix primitives
+
+┌  pm-auto 
+│
+◇  testing-suite - Jest, Testing Library, and Playwright for comprehensive testing
+```
+
+## When to use it
+
+Use `pm-auto describe` when you:
+
+- Want to understand what packages a preset includes before installing
+- Need to verify you're installing the correct preset
+- Want to document or share information about a specific preset
+- Are reviewing your configuration and need details on a particular preset
+
+## Example workflow
+
+```bash
+# List all available presets
+pm-auto list
+
+# Get details about a specific preset
+pm-auto describe next-stack
+
+# Install the preset after reviewing
+pm-auto install next-stack
+```
+
+<Note>
+  The `describe` command only shows the description field from your config. To see the full preset configuration including all packages, flags, and versions, you'll need to open your config file directly.
+</Note>
+
+<Note>
+  If the config file path is not set or the file doesn't exist, you'll be prompted to run `pm-auto config <path>` to set it up.
+</Note>

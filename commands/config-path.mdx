@@ -1,0 +1,120 @@
+---
+title: pm-auto config-path
+description: Display the path to your PM-Auto configuration file
+---
+
+## Usage
+
+```bash
+pm-auto config-path
+```
+
+**Alias:** `cp`
+
+You can use either command:
+
+```bash
+pm-auto config-path
+pm-auto cp
+```
+
+## What it does
+
+The `config-path` command reads `~/.pm-auto/settings.json` and displays the absolute path to your PM-Auto configuration file.
+
+## Examples
+
+### Display the config path
+
+```bash
+pm-auto config-path
+```
+
+```
+┌  pm-auto 
+│
+◇  Config Path: /Users/username/projects/myapp/pm-auto.json
+```
+
+### Using the alias
+
+```bash
+pm-auto cp
+```
+
+```
+┌  pm-auto 
+│
+◇  Config Path: /Users/username/projects/myapp/pm-auto.json
+```
+
+### When no config is set
+
+If you haven't set a config path yet:
+
+```bash
+pm-auto config-path
+```
+
+```
+┌  pm-auto 
+│
+◇  Run `pm-auto config <path>`, where <path> is the path to your config file
+✖  Config file path not set
+```
+
+## When to use it
+
+Use `pm-auto config-path` when you:
+
+- Want to verify which config file PM-Auto is using
+- Need to check if a config path has been set
+- Are debugging issues with preset loading
+- Want to confirm the absolute path to your config
+- Are documenting your PM-Auto setup for team members
+
+## Example workflow
+
+```bash
+# Check current config path
+pm-auto config-path
+
+# Update if needed
+pm-auto config ./new-config.json
+
+# Verify the change
+pm-auto config-path
+
+# List presets from the new config
+pm-auto list
+```
+
+## Where the config path is stored
+
+The config path is stored in:
+
+```
+~/.pm-auto/settings.json
+```
+
+You can also check this file directly:
+
+```bash
+cat ~/.pm-auto/settings.json
+```
+
+```json
+{
+  "configPath": "/Users/username/projects/myapp/pm-auto.json"
+}
+```
+
+<Note>
+  The displayed path is always an absolute path, even if you set it using a relative path with `pm-auto config`.
+</Note>
+
+## Related commands
+
+- [`pm-auto config`](/commands/config) - Set the config file path
+- [`pm-auto list`](/commands/list) - List all presets from the config
+- [`pm-auto describe`](/commands/describe) - View details about a specific preset

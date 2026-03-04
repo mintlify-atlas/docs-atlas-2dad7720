@@ -1,0 +1,129 @@
+---
+title: pm-auto uninstall
+description: Remove packages from your project using your detected package manager
+---
+
+## Usage
+
+```bash
+pm-auto uninstall <packages...>
+```
+
+**Aliases:** `remove`, `u`, `un`
+
+You can use any of these commands interchangeably:
+
+```bash
+pm-auto uninstall next-stack
+pm-auto remove next-stack
+pm-auto u next-stack
+pm-auto un next-stack
+```
+
+<Note>
+  Unlike `install`, the `uninstall` command requires at least one package name. You cannot uninstall all packages at once.
+</Note>
+
+## What it does
+
+When you run `pm-auto uninstall`, the tool:
+
+1. Reads your configuration file to find the specified preset(s)
+2. Detects your package manager (npm, pnpm, yarn, or bun)
+3. Extracts all non-interactive package names from the preset
+4. Batches and removes all packages in a single command
+5. Reports uninstallation time and success status
+
+<Warning>
+  Only non-interactive packages are uninstalled. Interactive commands (like `create-next-app`) cannot be uninstalled through PM-Auto since they modify your project structure rather than just adding packages.
+</Warning>
+
+## Options
+
+<ParamField path="--dry-run" type="boolean" default="false">
+  Display all commands that would be executed without actually running them. Use `-D` as a shorthand. After displaying the commands, you'll be prompted to continue or cancel.
+  
+  ```bash
+  pm-auto uninstall next-stack --dry-run
+  pm-auto u next-stack -D
+  ```
+</ParamField>
+
+## Examples
+
+### Uninstall a single preset
+
+```bash
+pm-auto uninstall next-stack
+```
+
+```
+┌  pm-auto 
+│
+◇  Uninstalling packages... next-stack
+◇  Running command: npm uninstall gsap @react-three/fiber clsx @types/three
+◇  Done!
+◇  Uninstallation took 3421ms
+◇  Packages uninstalled successfully
+```
+
+### Uninstall multiple presets
+
+```bash
+pm-auto uninstall next-stack ui-components
+```
+
+### Dry run to preview commands
+
+```bash
+pm-auto uninstall next-stack --dry-run
+```
+
+```
+┌  pm-auto 
+│
+◇  Uninstalling packages... next-stack
+◇  Dry Run:
+◇  Package name -> next-stack
+◇  running gsap
+◇  running @react-three/fiber
+◇  running clsx
+◇  running @types/three
+◆  Continue?
+│  Yes
+```
+
+## Package manager commands
+
+PM-Auto automatically uses the correct uninstall command based on your package manager:
+
+| Package Manager | Uninstall Command |
+|----------------|-------------------|
+| npm            | `npm uninstall`   |
+| pnpm           | `pnpm remove`     |
+| yarn           | `yarn remove`     |
+| bun            | `bun remove`      |
+
+## How it differs from install
+
+1. **Requires package names** - You must specify at least one preset to uninstall
+2. **No interactive commands** - Only non-interactive packages are removed
+3. **No `--add-flags` option** - The uninstall command doesn't support adding custom flags
+4. **Single batch command** - All packages from a preset are removed in one command
+
+## Error handling
+
+If a preset is not found in your config file:
+
+```bash
+pm-auto uninstall non-existent
+```
+
+```
+⚠  Package 'non-existent' not found in config
+✖  No configuration found
+```
+
+<Note>
+  If the config file path is not set or the file doesn't exist, you'll be prompted to run `pm-auto config <path>` to set it up.
+</Note>

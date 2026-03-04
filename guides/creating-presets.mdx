@@ -1,0 +1,270 @@
+---
+title: Creating presets
+description: Learn how to create effective package presets for your workflow
+---
+
+Presets are the core of PM-Auto. This guide walks you through creating presets that save time and standardize your development workflow.
+
+## What you'll learn
+
+By the end of this guide, you'll know how to:
+- Identify packages that belong together
+- Structure preset JSON correctly
+- Handle interactive and non-interactive packages
+- Add version pinning and custom flags
+- Test and refine your presets
+
+<Steps>
+  <Step title="Identify packages you install together">
+    Look at your recent projects and identify packages you repeatedly install as a group.
+    
+    For example, if you always set up Vite + React projects with the same dependencies, that's a good candidate for a preset.
+    
+    **Common groups:**
+    - Frontend frameworks (React + Vite + plugins)
+    - Backend APIs (Express + TypeScript + middleware)
+    - Testing setup (Vitest + Testing Library)
+    - Animation libraries (GSAP + Three.js)
+    
+    <Tip>
+      Start with your most frequent project type. You can always add more presets later.
+    </Tip>
+  </Step>
+  
+  <Step title="Choose your package manager">
+    Pick the package manager you use most often. PM-Auto supports:
+    - `npm` - Node Package Manager (default)
+    - `pnpm` - Fast, disk-efficient package manager
+    - `yarn` - Classic alternative to npm
+    - `bun` - Fast all-in-one JavaScript runtime
+    
+    The package manager you choose will be used for all commands in this preset.
+    
+    ```json
+    {
+      "my-preset": {
+        "packageManager": "npm"
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Structure your preset JSON">
+    Create a JSON object with the basic preset structure:
+    
+    ```json config.json
+    {
+      "my-preset": {
+        "presetName": "my-preset",
+        "description": "Brief description of what this preset includes",
+        "packageManager": "npm",
+        "packages": []
+      }
+    }
+    ```
+    
+    **Key fields:**
+    - `presetName` - Used in `pm-auto install <name>` (match the key)
+    - `description` - Shows up in `pm-auto list --desc`
+    - `packageManager` - Which package manager to use
+    - `packages` - Array of packages to install (we'll fill this next)
+  </Step>
+  
+  <Step title="Add packages to your preset">
+    Now add each package or group of packages to the `packages` array.
+    
+    **For simple packages:**
+    ```json
+    {
+      "command": "react react-dom",
+      "interactive": false
+    }
+    ```
+    
+    **For dev dependencies:**
+    ```json
+    {
+      "command": "@types/react @types/react-dom",
+      "interactive": false,
+      "dev": true
+    }
+    ```
+    
+    **For interactive commands** (like `create-react-app`, `create-next-app`):
+    ```json
+    {
+      "command": "create-next-app",
+      "interactive": true,
+      "flags": ["."]
+    }
+    ```
+    
+    <Warning>
+      Always set `"interactive": true` for commands that prompt for user input, or PM-Auto will hang waiting for input.
+    </Warning>
+  </Step>
+  
+  <Step title="Add version pinning and flags">
+    Lock specific versions or add custom flags when needed.
+    
+    **Pin a specific version:**
+    ```json
+    {
+      "command": "gsap",
+      "interactive": false,
+      "version": "3.11.4"
+    }
+    ```
+    
+    **Add custom flags:**
+    ```json
+    {
+      "command": "gsap",
+      "interactive": false,
+      "flags": ["--legacy-peer-deps"]
+    }
+    ```
+    
+    **Combine multiple options:**
+    ```json
+    {
+      "command": "typescript",
+      "interactive": false,
+      "dev": true,
+      "version": "5.9.3",
+      "flags": ["--exact"]
+    }
+    ```
+  </Step>
+  
+  <Step title="Test your preset">
+    Before using your preset on a real project, test it:
+    
+    **1. Validate the JSON syntax:**
+    ```bash
+    cat config.json | jq .
+    ```
+    
+    **2. Register your config:**
+    ```bash
+    pm-auto config ./config.json
+    ```
+    
+    **3. Dry run to preview commands:**
+    ```bash
+    pm-auto install my-preset --dry-run
+    ```
+    
+    Review the commands that will be executed. Look for:
+    - Correct package manager (npm vs pnpm vs yarn vs bun)
+    - Proper dev flags (-D or -d)
+    - Version strings (@version)
+    - Custom flags you added
+    
+    **4. Test in a temporary directory:**
+    ```bash
+    mkdir test-preset && cd test-preset
+    npm init -y
+    pm-auto install my-preset
+    ```
+    
+    Verify all packages installed correctly and your `package.json` looks right.
+  </Step>
+</Steps>
+
+## Complete example
+
+Here's a complete preset for a Vite + React + TypeScript project:
+
+```json config.json
+{
+  "vite-react-ts": {
+    "presetName": "vite-react-ts",
+    "description": "Vite + React + TypeScript with essential dev tools",
+    "packageManager": "npm",
+    "packages": [
+      {
+        "command": "react react-dom",
+        "interactive": false
+      },
+      {
+        "command": "@types/react @types/react-dom",
+        "interactive": false,
+        "dev": true
+      },
+      {
+        "command": "vite @vitejs/plugin-react",
+        "interactive": false,
+        "dev": true
+      },
+      {
+        "command": "typescript",
+        "interactive": false,
+        "dev": true,
+        "version": "5.9.3"
+      }
+    ]
+  }
+}
+```
+
+**To use it:**
+```bash
+pm-auto install vite-react-ts
+```
+
+## Tips for creating great presets
+
+<AccordionGroup>
+  <Accordion title="Keep presets focused">
+    Each preset should represent one type of project or workflow. Don't try to make one preset that handles everything.
+    
+    **Good:** `vite-react`, `next-app`, `express-api`  
+    **Bad:** `everything-i-might-need`
+  </Accordion>
+  
+  <Accordion title="Use clear, short names">
+    Preset names should be easy to type and remember.
+    
+    **Good:** `next`, `vite`, `three`  
+    **Bad:** `next-js-with-typescript-and-tailwind-setup`
+  </Accordion>
+  
+  <Accordion title="Order packages logically">
+    Put interactive commands first if you have them, then group related packages together.
+    
+    ```json
+    [
+      // Interactive scaffolding first
+      { "command": "create-next-app", "interactive": true },
+      // Then core packages
+      { "command": "react react-dom", "interactive": false },
+      // Then dev dependencies
+      { "command": "@types/react", "interactive": false, "dev": true }
+    ]
+    ```
+  </Accordion>
+  
+  <Accordion title="Document with descriptions">
+    Always include a description so you remember what each preset is for:
+    
+    ```json
+    {
+      "description": "Three.js + React + GSAP for 3D web experiences"
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## What's next?
+
+Now that you know how to create presets:
+
+<CardGroup cols={2}>
+  <Card title="See examples" icon="code" href="/guides/examples">
+    Browse real-world preset examples for inspiration
+  </Card>
+  <Card title="Config schema" icon="file-code" href="/reference/config-schema">
+    View the complete configuration reference
+  </Card>
+</CardGroup>

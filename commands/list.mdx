@@ -1,0 +1,104 @@
+---
+title: pm-auto list
+description: Display all available presets from your configuration file
+---
+
+## Usage
+
+```bash
+pm-auto list
+```
+
+**Alias:** `ls`
+
+You can use either command:
+
+```bash
+pm-auto list
+pm-auto ls
+```
+
+## What it does
+
+The `list` command reads your configuration file and displays all available preset names. This is useful when you want to see what presets you can install without opening the config file.
+
+## Options
+
+<ParamField path="--desc" type="boolean" default="false">
+  Display each preset's description alongside its name.
+  
+  ```bash
+  pm-auto list --desc
+  ```
+</ParamField>
+
+## Examples
+
+### List all presets
+
+```bash
+pm-auto list
+```
+
+```
+┌  pm-auto 
+│
+◇  next-stack
+◇  ui-components
+◇  testing-suite
+◇  analytics-kit
+```
+
+### List presets with descriptions
+
+```bash
+pm-auto list --desc
+```
+
+```
+┌  pm-auto 
+│
+◇  next-stack - Next.js app with shadcn/ui, GSAP, and React Three Fiber
+◇  ui-components - Shadcn/ui components with Tailwind and Radix primitives
+◇  testing-suite - Jest, Testing Library, and Playwright for comprehensive testing
+◇  analytics-kit - Posthog and Vercel Analytics for product insights
+```
+
+### When a preset has no description
+
+```bash
+pm-auto list --desc
+```
+
+```
+┌  pm-auto 
+│
+◇  my-preset - No description
+◇  another-preset - Custom preset for API development
+```
+
+## When to use it
+
+Use `pm-auto list` when you:
+
+- Want to see all available presets without opening your config file
+- Need to remember the exact name of a preset before installing
+- Want to share your available presets with team members
+- Need to verify a preset exists before running `pm-auto install`
+
+## Example workflow
+
+```bash
+# List all presets to see what's available
+pm-auto list --desc
+
+# Install a specific preset
+pm-auto install next-stack
+
+# Verify what you installed
+pm-auto describe next-stack
+```
+
+<Note>
+  If the config file path is not set or the file doesn't exist, you'll be prompted to run `pm-auto config <path>` to set it up.
+</Note>

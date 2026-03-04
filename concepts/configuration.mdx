@@ -1,0 +1,504 @@
+---
+title: Configuration
+description: Deep dive into PM-Auto's configuration structure and package options
+---
+
+PM-Auto uses a JSON configuration file to define presets. This guide covers the complete configuration structure, package-level options, and how to effectively use each field.
+
+## Config file structure
+
+Your configuration file is a JSON object where each top-level key is a preset name:
+
+```json
+{
+  "preset-name-1": {
+    "presetName": "preset-name-1",
+    "description": "Optional description",
+    "packageManager": "npm",
+    "packages": []
+  },
+  "preset-name-2": {
+    "presetName": "preset-name-2",
+    "packageManager": "pnpm",
+    "packages": []
+  }
+}
+```
+
+<Note>
+  The top-level JSON key should match the `presetName` field for consistency.
+</Note>
+
+## Preset-level fields
+
+Each preset has four main fields:
+
+### presetName (required)
+
+The unique identifier for your preset. Use kebab-case for consistency.
+
+```json
+{
+  "presetName": "nextjs-shadcn"
+}
+```
+
+### description (optional)
+
+A human-readable explanation of what the preset does. This helps other developers understand the preset's purpose.
+
+```json
+{
+  "description": "Next.js 14 with shadcn/ui, Tailwind CSS, and TypeScript"
+}
+```
+
+### packageManager (required)
+
+The package manager to use. Must be one of: `npm`, `pnpm`, `yarn`, or `bun`.
+
+```json
+{
+  "packageManager": "bun"
+}
+```
+
+See [Package Managers](/concepts/package-managers) for details on how PM-Auto handles different package managers.
+
+### packages (required)
+
+An array of package configurations. This is where you define what to install and how to install it.
+
+```json
+{
+  "packages": [
+    {
+      "command": "react",
+      "interactive": false
+    }
+  ]
+}
+```
+
+## Package-level fields
+
+Each package in the `packages` array is an object with these fields:
+
+```typescript
+interface PackageType {
+  command: string;        // Required: Package name or command
+  interactive: boolean;   // Required: Does this package prompt for input?
+  dev?: boolean;          // Optional: Install as dev dependency?
+  flags?: string[];       // Optional: Additional flags to pass
+  version?: string;       // Optional: Specific version to install
+}
+```
+
+### command (required)
+
+The package name or command to run. This is the core identifier for what you're installing.
+
+<CodeGroup>
+```json Simple package
+{
+  "command": "react"
+}
+```
+
+```json Scoped package
+{
+  "command": "@types/node"
+}
+```
+
+```json CLI tool
+{
+  "command": "create-next-app"
+}
+```
+</CodeGroup>
+
+<Warning>
+  Don't include version numbers or flags in the `command` field. Use the `version` and `flags` fields instead.
+</Warning>
+
+**Examples:**
+
+- ✅ `"command": "gsap"`
+- ✅ `"command": "@react-three/fiber"`
+- ❌ `"command": "gsap@3.11.4"`
+- ❌ `"command": "gsap -D"`
+
+### interactive (required)
+
+Indicates whether the package requires user input during installation.
+
+**Set to `true` for:**
+- Project scaffolding tools (`create-next-app`, `create-vite`)
+- CLI tools with initialization prompts (`shadcn init`, `prisma init`)
+- Any command that asks questions during execution
+
+**Set to `false` for:**
+- Standard npm packages
+- Libraries that install silently
+- Dependencies with no setup prompts
+
+```json
+{
+  "packages": [
+    {
+      "command": "create-next-app",
+      "interactive": true,
+      "flags": ["."]
+    },
+    {
+      "command": "react-router-dom",
+      "interactive": false
+    }
+  ]
+}
+```
+
+<Info>
+  Interactive packages are run sequentially one at a time. Non-interactive packages are batched into a single install command for efficiency.
+</Info>
+
+### dev (optional)
+
+Installs the package as a development dependency.
+
+```json
+{
+  "command": "@types/node",
+  "interactive": false,
+  "dev": true
+}
+```
+
+This translates to:
+
+<CodeGroup>
+```bash npm
+npm install @types/node -D
+```
+
+```bash pnpm
+pnpm add @types/node -D
+```
+
+```bash bun
+bun add @types/node -d
+```
+</CodeGroup>
+
+**Common dev dependencies:**
+- TypeScript type definitions (`@types/*`)
+- Build tools and bundlers (`vite`, `webpack`, `rollup`)
+- Testing libraries (`vitest`, `jest`, `@testing-library/react`)
+- Linters and formatters (`eslint`, `prettier`)
+
+**Default value:** `false` (installs as regular dependency)
+
+### flags (optional)
+
+An array of additional flags to pass to the install command. Each flag is a separate string in the array.
+
+```json
+{
+  "command": "gsap",
+  "interactive": false,
+  "flags": ["--peer-deps", "--ignore-scripts"]
+}
+```
+
+Generates:
+
+```bash
+npm install gsap --peer-deps --ignore-scripts
+```
+
+#### Common use cases:
+
+**For interactive commands** (scaffolding tools):
+
+```json
+{
+  "command": "create-next-app",
+  "interactive": true,
+  "flags": ["."]
+}
+```
+
+Generates: `npx create-next-app .` (installs in current directory)
+
+**For packages with special installation requirements:**
+
+```json
+{
+  "command": "sharp",
+  "interactive": false,
+  "flags": ["--ignore-scripts"]
+}
+```
+
+**For CLI tool arguments:**
+
+```json
+{
+  "command": "shadcn",
+  "interactive": true,
+  "flags": ["init", "--yes"]
+}
+```
+
+Generates: `npx shadcn init --yes`
+
+<Note>
+  Flags are appended to the command in the order they appear in the array.
+</Note>
+
+### version (optional)
+
+Specifies the version to install. Can be a specific version number, a version range, or a tag like `latest` or `next`.
+
+```json
+{
+  "command": "gsap",
+  "interactive": false,
+  "version": "3.11.4"
+}
+```
+
+Generates: `npm install gsap@3.11.4`
+
+**Version formats:**
+
+<CodeGroup>
+```json Exact version
+{
+  "version": "3.11.4"
+}
+```
+
+```json Version tag
+{
+  "version": "latest"
+}
+```
+
+```json Beta/next version
+{
+  "version": "next"
+}
+```
+
+```json Caret range
+{
+  "version": "^3.0.0"
+}
+```
+</CodeGroup>
+
+**When to specify versions:**
+
+- ✅ For packages where you need a specific version for compatibility
+- ✅ For production presets where you want reproducible builds
+- ✅ For beta/experimental features (`"version": "next"`)
+- ❌ For most packages (let the package manager use latest by default)
+
+**Default behavior:** If omitted, the package manager installs the latest stable version.
+
+## Complete example with all fields
+
+Here's a real preset from PM-Auto's source that demonstrates every configuration option:
+
+```json
+{
+  "example": {
+    "presetName": "example",
+    "description": "A sample configuration demonstrating all options for PM-Auto",
+    "packageManager": "bun",
+    "packages": [
+      {
+        "command": "create-next-app",
+        "interactive": true,
+        "dev": false,
+        "version": "latest",
+        "flags": ["."]
+      },
+      {
+        "command": "shadcn",
+        "interactive": true,
+        "dev": false,
+        "version": "latest",
+        "flags": ["init"]
+      },
+      {
+        "command": "gsap",
+        "interactive": false,
+        "dev": false,
+        "version": "3.11.4",
+        "flags": ["--peer-deps"]
+      },
+      {
+        "command": "@react-three/fiber",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "clsx",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "@types/three",
+        "interactive": false,
+        "dev": true
+      }
+    ]
+  }
+}
+```
+
+### What this preset does:
+
+1. **Scaffolds a Next.js project** using `bunx create-next-app@latest .`
+2. **Initializes shadcn/ui** using `bunx shadcn@latest init`
+3. **Batches non-interactive packages** into one command:
+   ```bash
+   bun add gsap@3.11.4 --peer-deps @react-three/fiber clsx @types/three -d
+   ```
+
+<Note>
+  Notice how the last package (`@types/three`) uses `"dev": true` and gets the `-d` flag appended at the end of the batched command.
+</Note>
+
+## Config file location
+
+PM-Auto looks for a `config.json` file in the current directory by default. You can:
+
+1. **Use the default location**: Place `config.json` in the root of your project or current directory
+2. **Use `pm-auto config`**: Run the config command to open and edit your configuration
+3. **Specify a custom path**: Pass a custom config file path as a command-line argument (check `pm-auto --help` for syntax)
+
+### Viewing your configuration
+
+Use the `pm-auto config` command to view or edit your current configuration:
+
+```bash
+pm-auto config
+```
+
+This opens your `config.json` file in your default editor.
+
+## Multiple presets in one config
+
+You can define as many presets as you need in a single `config.json` file:
+
+```json
+{
+  "nextjs-basic": {
+    "presetName": "nextjs-basic",
+    "description": "Minimal Next.js setup",
+    "packageManager": "npm",
+    "packages": [
+      {
+        "command": "create-next-app",
+        "interactive": true,
+        "flags": ["."]
+      }
+    ]
+  },
+  "nextjs-full": {
+    "presetName": "nextjs-full",
+    "description": "Next.js with full UI stack",
+    "packageManager": "bun",
+    "packages": [
+      {
+        "command": "create-next-app",
+        "interactive": true,
+        "flags": ["."]
+      },
+      {
+        "command": "shadcn",
+        "interactive": true,
+        "flags": ["init"]
+      },
+      {
+        "command": "framer-motion",
+        "interactive": false
+      }
+    ]
+  },
+  "testing": {
+    "presetName": "testing",
+    "description": "Testing utilities",
+    "packageManager": "pnpm",
+    "packages": [
+      {
+        "command": "vitest",
+        "interactive": false,
+        "dev": true
+      },
+      {
+        "command": "@testing-library/react",
+        "interactive": false,
+        "dev": true
+      }
+    ]
+  }
+}
+```
+
+Install any preset by name:
+
+```bash
+pm-auto install nextjs-basic
+pm-auto install nextjs-full
+pm-auto install testing
+```
+
+## Best practices
+
+<AccordionGroup>
+  <Accordion title="Keep presets focused">
+    Each preset should have a clear purpose. Instead of one massive preset, create multiple targeted presets that can be composed together.
+    
+    **Good**: `nextjs-base`, `ui-libraries`, `testing-setup`  
+    **Bad**: `everything-i-might-need`
+  </Accordion>
+
+  <Accordion title="Document your presets">
+    Always include a `description` field. Your future self and teammates will thank you.
+  </Accordion>
+
+  <Accordion title="Version critical dependencies">
+    For packages where version matters (breaking changes, specific features), explicitly set the `version` field.
+  </Accordion>
+
+  <Accordion title="Group related packages">
+    Order packages logically in your config. Put interactive commands first, then group related libraries together.
+  </Accordion>
+
+  <Accordion title="Test your presets">
+    Before sharing a preset, test it in a fresh project to ensure all packages install correctly and in the right order.
+  </Accordion>
+</AccordionGroup>
+
+## Validation
+
+PM-Auto validates your configuration when you run a command. Common errors include:
+
+<Warning>
+  **Missing required fields**: Every preset must have `presetName`, `packageManager`, and `packages`.
+</Warning>
+
+<Warning>
+  **Invalid package manager**: Only `npm`, `pnpm`, `yarn`, and `bun` are supported.
+</Warning>
+
+<Warning>
+  **Malformed JSON**: Ensure your config file is valid JSON (use a JSON validator if needed).
+</Warning>
+
+If your configuration has errors, PM-Auto will display a helpful error message indicating what needs to be fixed.

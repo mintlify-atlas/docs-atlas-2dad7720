@@ -1,0 +1,380 @@
+---
+title: Best practices
+description: Tips and recommendations for creating effective PM-Auto presets
+---
+
+Follow these best practices to create presets that are maintainable, reusable, and easy to understand.
+
+## Organizing presets
+
+### Keep presets focused
+
+Each preset should represent **one type of project or workflow**. Don't try to make a single preset that handles every scenario.
+
+<Tip>
+  **Good:** `vite-react`, `next-app`, `express-api`, `test-setup`
+  
+  **Bad:** `everything`, `all-my-deps`, `kitchen-sink`
+</Tip>
+
+**Why?** Focused presets are:
+- Easier to understand and maintain
+- More reusable across different projects
+- Faster to install (you only get what you need)
+- Simpler to debug when something goes wrong
+
+### Group related packages
+
+Within a preset, group packages that serve similar purposes:
+
+```json
+{
+  "packages": [
+    // Framework core
+    { "command": "react react-dom", "interactive": false },
+    
+    // Type definitions
+    { "command": "@types/react @types/react-dom", "interactive": false, "dev": true },
+    
+    // Build tools
+    { "command": "vite @vitejs/plugin-react", "interactive": false, "dev": true },
+    
+    // Utilities
+    { "command": "clsx", "interactive": false }
+  ]
+}
+```
+
+**Why?** Logical grouping makes it easy to:
+- Scan what's included at a glance
+- Add or remove related packages together
+- Understand the purpose of each section
+
+## Naming conventions
+
+### Use short, descriptive names
+
+Preset names should be easy to type and remember.
+
+<Tip>
+  **Good:** `next`, `vite`, `three`, `test`, `api`
+  
+  **Bad:** `next-js-with-typescript-and-tailwind-css-setup-for-production`
+</Tip>
+
+### Follow a consistent pattern
+
+If you manage multiple presets, use a consistent naming scheme:
+
+```json
+{
+  "vite-react": { ... },
+  "vite-vue": { ... },
+  "next-app": { ... },
+  "next-api": { ... }
+}
+```
+
+**Pattern:** `framework-variant` or `tool-purpose`
+
+### Match presetName to key
+
+The preset key and `presetName` field should always match:
+
+```json
+{
+  "vite-react": {
+    "presetName": "vite-react",  // ✅ Matches the key
+    ...
+  }
+}
+```
+
+**Why?** PM-Auto uses the `presetName` field for the install command, so matching them prevents confusion.
+
+## Using descriptions
+
+### Always include descriptions
+
+Every preset should have a clear description:
+
+```json
+{
+  "threejs-react": {
+    "presetName": "threejs-react",
+    "description": "Three.js + React for 3D web experiences",
+    ...
+  }
+}
+```
+
+**Why?** Descriptions help you:
+- Remember what each preset does months later
+- Choose the right preset when you have many options
+- Share presets with teammates who aren't familiar with them
+
+### Write clear, concise descriptions
+
+<Tip>
+  **Good:** "Vite + React with TypeScript and essential dev tools"
+  
+  **Bad:** "Some React stuff" or "All the packages I need for React development including Vite as a build tool and TypeScript for type safety"
+</Tip>
+
+Aim for **1-2 sentences** that capture the preset's purpose and key components.
+
+## Version pinning strategies
+
+### Pin versions for critical packages
+
+Use version pinning when you need a specific version:
+
+```json
+{
+  "command": "typescript",
+  "interactive": false,
+  "dev": true,
+  "version": "5.9.3"  // Pin to specific version
+}
+```
+
+**When to pin:**
+- Breaking changes are common in the package
+- You need a specific feature from a particular version
+- You want reproducible installs across environments
+
+### Let minor versions float
+
+For most packages, omit the version to get the latest:
+
+```json
+{
+  "command": "react react-dom",
+  "interactive": false
+  // No version = gets latest
+}
+```
+
+**Why?** You'll automatically get:
+- Bug fixes
+- Security patches
+- Performance improvements
+
+### Document version decisions
+
+If you pin a version for a specific reason, add a comment (in documentation or a separate README):
+
+```markdown
+## Version notes
+
+- TypeScript pinned to 5.9.3 - version 6.0 has breaking changes with our build setup
+- React at latest - we want the newest features
+```
+
+## Interactive package handling
+
+### Always set interactive flag correctly
+
+<Warning>
+  **Critical:** If a command prompts for user input, you MUST set `"interactive": true`. Otherwise, PM-Auto will hang.
+</Warning>
+
+**Interactive commands:**
+```json
+{
+  "command": "create-next-app",
+  "interactive": true  // ✅ Correct - this command prompts for input
+}
+```
+
+**Common interactive commands:**
+- `create-next-app`
+- `create-react-app`
+- `create-vite`
+- `shadcn` (with `init` flag)
+- Any command that asks questions
+
+### Pass flags to skip prompts
+
+When possible, use flags to make interactive commands non-interactive:
+
+```json
+{
+  "command": "create-next-app",
+  "interactive": false,  // Can be non-interactive with enough flags
+  "flags": ["my-app", "--typescript", "--tailwind", "--app", "--no-git"]
+}
+```
+
+**Why?** Non-interactive installs:
+- Are faster (no waiting for user input)
+- Can run unattended
+- Are easier to script and automate
+
+## Config file organization
+
+### One config per project type
+
+For personal use, keep all your presets in one `config.json`:
+
+```json config.json
+{
+  "vite-react": { ... },
+  "next-app": { ... },
+  "express-api": { ... },
+  "test-setup": { ... }
+}
+```
+
+### Multiple configs for teams
+
+For teams or complex workflows, use separate config files:
+
+```
+configs/
+  frontend.json    (React, Vue, Next.js presets)
+  backend.json     (Express, Fastify, NestJS presets)
+  tooling.json     (Testing, linting, build tools)
+```
+
+Switch between them:
+```bash
+pm-auto config ./configs/frontend.json
+pm-auto config ./configs/backend.json
+```
+
+### Use dry-run before committing changes
+
+Before running a preset for real, preview what will happen:
+
+```bash
+pm-auto install my-preset --dry-run
+```
+
+Check that:
+- Commands look correct
+- Package manager is right (npm vs pnpm vs yarn vs bun)
+- Dev flags are applied to the right packages
+- Versions are specified where needed
+
+## Sharing presets
+
+### Store configs in version control
+
+Commit your `config.json` to git so your team can use the same presets:
+
+```bash
+git add config.json
+git commit -m "Add PM-Auto presets for team workflows"
+```
+
+### Document your presets
+
+Create a README explaining each preset:
+
+```markdown README.md
+# PM-Auto Presets
+
+## Available presets
+
+### `vite-react`
+Vite + React with TypeScript. Use for new client-side React apps.
+
+### `next-app`
+Next.js with app router and Tailwind. Use for full-stack React apps.
+
+### `express-api`
+Express + TypeScript. Use for REST APIs.
+
+## Usage
+
+1. Register the config:
+   ```bash
+   pm-auto config ./config.json
+   ```
+
+2. Install a preset:
+   ```bash
+   pm-auto install vite-react
+   ```
+```
+
+### Test on a fresh project first
+
+Before sharing a new preset with your team, test it in a clean directory:
+
+```bash
+mkdir test-preset && cd test-preset
+npm init -y
+pm-auto install my-new-preset
+```
+
+Verify everything installs correctly and `package.json` looks right.
+
+## Performance tips
+
+### Batch non-interactive packages
+
+PM-Auto automatically batches non-interactive packages into a single install command. Help it do this by marking packages correctly:
+
+```json
+// ✅ Good - these will be batched together
+[
+  { "command": "react react-dom", "interactive": false },
+  { "command": "clsx", "interactive": false }
+]
+
+// ❌ Unnecessary - these could be one command
+[
+  { "command": "react", "interactive": false },
+  { "command": "react-dom", "interactive": false },
+  { "command": "clsx", "interactive": false }
+]
+```
+
+### Use faster package managers
+
+For speed, consider `pnpm` or `bun` instead of `npm`:
+
+```json
+{
+  "packageManager": "pnpm"  // Faster than npm
+}
+```
+
+**Speed comparison (typical):**
+- `bun` - Fastest
+- `pnpm` - Fast (also saves disk space)
+- `yarn` - Moderate
+- `npm` - Slower (but most compatible)
+
+## Maintenance
+
+### Review and update regularly
+
+Every few months:
+1. Test each preset in a fresh directory
+2. Update pinned versions if needed
+3. Remove packages you no longer use
+4. Add new packages you find yourself installing repeatedly
+
+### Keep a changelog
+
+Document changes to shared presets:
+
+```markdown CHANGELOG.md
+## 2024-03-04
+- Updated `vite-react`: Added `clsx` for className utilities
+- Removed `test-jest`: Replaced with `test-vitest`
+```
+
+## What's next?
+
+<CardGroup cols={2}>
+  <Card title="Config schema" icon="file-code" href="/reference/config-schema">
+    Complete reference for all configuration options
+  </Card>
+  <Card title="Troubleshooting" icon="circle-question" href="/reference/troubleshooting">
+    Solutions for common issues
+  </Card>
+</CardGroup>

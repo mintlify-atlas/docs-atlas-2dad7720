@@ -1,0 +1,358 @@
+---
+title: Troubleshooting
+description: Common issues and solutions for PM-Auto configuration and installation problems
+---
+
+This guide covers common issues you may encounter when using PM-Auto and how to resolve them.
+
+## Quick diagnostics
+
+Before troubleshooting specific issues, run these diagnostic commands:
+
+```bash
+# Check your PM-Auto version
+pm-auto -V
+
+# Verify your config path is set
+pm-auto config-path
+
+# List available presets
+pm-auto list
+
+# Preview commands without running them
+pm-auto install <preset-name> --dry-run
+```
+
+## Common issues
+
+<Accordion title="Nothing installs when I run pm-auto install">
+  This usually indicates a configuration path issue.
+  
+  **Symptoms:**
+  - No packages are installed
+  - No error messages appear
+  - Commands seem to complete instantly
+  
+  **Solutions:**
+  
+  1. **Check if config path is set:**
+     ```bash
+     pm-auto config-path
+     ```
+     
+  2. **Register your config file:**
+     ```bash
+     pm-auto config ./config.json
+     ```
+     
+  3. **Verify the file exists:**
+     ```bash
+     ls -la config.json
+     ```
+     
+  4. **Use absolute path if relative path fails:**
+     ```bash
+     pm-auto config /full/path/to/config.json
+     ```
+  
+  <Warning>
+    Always re-register your config path after moving or renaming the file.
+  </Warning>
+</Accordion>
+
+<Accordion title="Command hangs and never completes">
+  This happens when an interactive command is marked as non-interactive.
+  
+  **Symptoms:**
+  - Installation freezes
+  - Terminal becomes unresponsive
+  - Process doesn't complete or show progress
+  
+  **Solution:**
+  
+  Set `"interactive": true` for commands that prompt for user input:
+  
+  ```json
+  {
+    "command": "create-next-app",
+    "interactive": true,  // ← This is required
+    "flags": ["."]
+  }
+  ```
+  
+  **Common interactive commands:**
+  - `create-next-app`
+  - `create-react-app`
+  - `create-vite`
+  - `shadcn init`
+  - `prisma init`
+  
+  After fixing, re-register your config:
+  ```bash
+  pm-auto config ./config.json
+  ```
+</Accordion>
+
+<Accordion title="Wrong package manager is being used">
+  PM-Auto uses the package manager specified in your preset configuration.
+  
+  **Symptoms:**
+  - Commands execute with npm instead of pnpm/yarn/bun
+  - Package manager warnings appear
+  - Lock files don't match expected package manager
+  
+  **Solution:**
+  
+  1. **Check your preset's packageManager field:**
+     ```bash
+     pm-auto describe <preset-name>
+     ```
+     
+  2. **Update the packageManager in your config:**
+     ```json
+     {
+       "presetName": "example",
+       "packageManager": "pnpm",  // ← Must be: npm, pnpm, yarn, or bun
+       "packages": [...]
+     }
+     ```
+     
+  3. **Re-register your config:**
+     ```bash
+     pm-auto config ./config.json
+     ```
+  
+  <Warning>
+    The packageManager field is case-sensitive and must be lowercase.
+  </Warning>
+</Accordion>
+
+<Accordion title="Config file not found or can't be read">
+  PM-Auto cannot locate or read your configuration file.
+  
+  **Symptoms:**
+  - Error: "Config file not found"
+  - Error: "Cannot read config"
+  - `pm-auto list` shows no presets
+  
+  **Solutions:**
+  
+  1. **Verify file path and permissions:**
+     ```bash
+     ls -la config.json
+     ```
+     
+  2. **Check file read permissions:**
+     ```bash
+     chmod 644 config.json
+     ```
+     
+  3. **Use absolute path:**
+     ```bash
+     pm-auto config "$(pwd)/config.json"
+     ```
+     
+  4. **Verify config path is stored correctly:**
+     ```bash
+     pm-auto config-path
+     ```
+</Accordion>
+
+<Accordion title="JSON syntax errors in config file">
+  Your configuration file contains invalid JSON syntax.
+  
+  **Symptoms:**
+  - Error: "Unexpected token"
+  - Error: "JSON parse error"
+  - Config file won't load
+  
+  **Common causes:**
+  
+  1. **Trailing commas** (not allowed in JSON):
+     ```json
+     // ❌ Wrong
+     {
+       "packages": [
+         {"command": "react"},  // ← Remove this comma
+       ]
+     }
+     
+     // ✅ Correct
+     {
+       "packages": [
+         {"command": "react"}
+       ]
+     }
+     ```
+     
+  2. **Comments in JSON** (not allowed):
+     ```json
+     // ❌ Wrong
+     {
+       "command": "react",  // this is a comment
+       "interactive": false
+     }
+     
+     // ✅ Correct
+     {
+       "command": "react",
+       "interactive": false
+     }
+     ```
+     
+  3. **Single quotes instead of double quotes:**
+     ```json
+     // ❌ Wrong
+     {'command': 'react'}
+     
+     // ✅ Correct
+     {"command": "react"}
+     ```
+  
+  **Solution:**
+  
+  Use a JSON validator to check your syntax:
+  - [JSONLint](https://jsonlint.com/)
+  - VS Code JSON validation (built-in)
+  - `jq` command line tool: `jq . config.json`
+</Accordion>
+
+<Accordion title="Permission denied errors during installation">
+  You don't have permission to install packages globally or in the current directory.
+  
+  **Symptoms:**
+  - Error: "EACCES: permission denied"
+  - Error: "EPERM: operation not permitted"
+  - Installation fails partway through
+  
+  **Solutions:**
+  
+  1. **For global installations**, fix npm permissions:
+     ```bash
+     # Create a directory for global packages
+     mkdir -p ~/.npm-global
+     
+     # Configure npm to use it
+     npm config set prefix '~/.npm-global'
+     
+     # Add to PATH in ~/.bashrc or ~/.zshrc
+     export PATH=~/.npm-global/bin:$PATH
+     
+     # Reload shell config
+     source ~/.bashrc
+     ```
+     
+  2. **For local installations**, check directory permissions:
+     ```bash
+     ls -la .
+     ```
+     
+  3. **Avoid using sudo** with npm/pnpm/yarn (causes permission issues)
+  
+  4. **For Windows**, run terminal as administrator
+</Accordion>
+
+<Accordion title="Preset not found when running install">
+  The preset name you specified doesn't exist in your configuration.
+  
+  **Symptoms:**
+  - Error: "Preset not found"
+  - Error: "Unknown preset"
+  
+  **Solutions:**
+  
+  1. **List all available presets:**
+     ```bash
+     pm-auto list
+     ```
+     
+  2. **Check preset name spelling:**
+     Preset names are case-sensitive. Ensure the name matches exactly.
+     
+  3. **Verify presetName matches the key:**
+     ```json
+     {
+       "my-preset": {           // ← Top-level key
+         "presetName": "my-preset",  // ← Must match key
+         ...
+       }
+     }
+     ```
+     
+  4. **Re-register config after adding new presets:**
+     ```bash
+     pm-auto config ./config.json
+     ```
+</Accordion>
+
+<Accordion title="Packages install but with wrong versions">
+  Packages are installed but not with the versions specified in your config.
+  
+  **Symptoms:**
+  - Different version than specified gets installed
+  - Latest version installs despite specifying exact version
+  
+  **Solutions:**
+  
+  1. **Check version syntax in config:**
+     ```json
+     {
+       "command": "gsap",
+       "version": "3.11.4",  // ← String, not number
+       "interactive": false
+     }
+     ```
+     
+  2. **Use dry-run to preview commands:**
+     ```bash
+     pm-auto install <preset-name> --dry-run
+     ```
+     
+  3. **Verify version exists on npm registry:**
+     ```bash
+     npm view <package-name> versions
+     ```
+</Accordion>
+
+<Accordion title="Dev dependencies install as regular dependencies">
+  Packages marked as dev dependencies install as regular dependencies.
+  
+  **Symptoms:**
+  - Dev packages appear in `dependencies` instead of `devDependencies`
+  - Wrong section in package.json
+  
+  **Solution:**
+  
+  Ensure `dev` field is set to `true`:
+  ```json
+  {
+    "command": "@types/node",
+    "interactive": false,
+    "dev": true  // ← Must be boolean true, not string "true"
+  }
+  ```
+  
+  After fixing:
+  ```bash
+  pm-auto config ./config.json
+  ```
+</Accordion>
+
+## Getting more help
+
+If your issue isn't covered here:
+
+1. **Check command documentation:**
+   - [Install command](/commands/install)
+   - [Config command](/commands/config)
+   - [Configuration schema](/reference/config-schema)
+
+2. **Report an issue:**
+   - [GitHub Issues](https://github.com/yourusername/pm-auto/issues)
+   - Include your PM-Auto version (`pm-auto -V`)
+   - Include relevant config (sanitized)
+   - Include error messages
+
+3. **Review examples:**
+   - Use `--dry-run` to preview commands
+   - Check the auto-generated example in your config

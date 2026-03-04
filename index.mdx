@@ -1,97 +1,261 @@
----
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
----
+<div className="relative min-h-screen bg-gradient-to-br from-[#0f1117] via-[#1a1d27] to-[#0f1117] dark:bg-gradient-to-br dark:from-[#0f1117] dark:via-[#1a1d27] dark:to-[#0f1117] bg-white">
+  {/* Hero Section */}
+  <div className="relative py-20 px-6 sm:px-8 lg:px-12">
+    <div className="max-w-6xl mx-auto">
+      <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+        {/* Hero Content */}
+        <div className="flex-1 text-center lg:text-left">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6">
+            Install your entire tech stack with one command
+          </h1>
+          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto lg:mx-0">
+            PM-Auto lets you define reusable package presets and install them anywhere instantly. No more copy-pasting npm commands or forgetting dependencies.
+          </p>
+          <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
+            <a 
+              href="/quickstart" 
+              className="inline-flex items-center px-6 py-3 rounded-lg bg-[#3B82F6] hover:bg-[#1E40AF] text-white font-semibold transition-colors"
+            >
+              Get started
+              <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </a>
+            <a 
+              href="/commands/install" 
+              className="inline-flex items-center px-6 py-3 rounded-lg border border-gray-300 dark:border-white/20 bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/10 text-gray-900 dark:text-white font-semibold transition-colors"
+            >
+              View commands
+            </a>
+          </div>
+        </div>
 
-## Setting up
+        {/* Hero Code Example */}
+        <div className="flex-1 w-full lg:w-auto">
+          <div className="bg-[#1a1d27] dark:bg-[#1a1d27] rounded-xl border border-[#27272a] dark:border-[#27272a] p-6 shadow-2xl">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            </div>
+            <pre className="text-sm text-gray-300">
+              <code>{`# Define your preset once
+{
+  "vite-react": {
+    "presetName": "vite-react",
+    "packageManager": "npm",
+    "packages": [
+      { "command": "react react-dom" },
+      { "command": "vite @vitejs/plugin-react" }
+    ]
+  }
+}
 
-Get your documentation site up and running in minutes.
+# Install everywhere
+$ pm-auto install vite-react
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+✓ Done!`}</code>
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-## Make it yours
+{/* Quick Start Section */}
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Quick start</h2>
+  <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">Get up and running with PM-Auto in minutes</p>
+  
+  <Steps>
+    <Step title="Install PM-Auto globally">
+      Install PM-Auto using your preferred package manager:
+      
+      <CodeGroup>
+      ```bash npm
+      npm install -g pm-auto
+      ```
+      ```bash pnpm
+      pnpm add -g pm-auto
+      ```
+      ```bash yarn
+      yarn global add pm-auto
+      ```
+      </CodeGroup>
+    </Step>
+    
+    <Step title="Create your config file">
+      Create a `config.json` file with your first preset:
+      
+      ```json config.json
+      {
+        "vite-react": {
+          "presetName": "vite-react",
+          "description": "Vite + React setup",
+          "packageManager": "npm",
+          "packages": [
+            { "command": "react react-dom", "interactive": false },
+            { "command": "vite @vitejs/plugin-react", "interactive": false }
+          ]
+        }
+      }
+      ```
+    </Step>
+    
+    <Step title="Register your config">
+      Tell PM-Auto where to find your config file:
+      
+      ```bash
+      pm-auto config ./config.json
+      ```
+    </Step>
+    
+    <Step title="Install your preset">
+      Install all packages from your preset with one command:
+      
+      ```bash
+      pm-auto install vite-react
+      ```
+      
+      <Note>
+        PM-Auto will execute all install commands in order using the specified package manager.
+      </Note>
+    </Step>
+  </Steps>
+</div>
 
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
+{/* Explore by Topic */}
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Explore by topic</h2>
+  <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">Learn about PM-Auto's core features and commands</p>
+  
+  <CardGroup cols={2}>
     <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+      title="Core concepts"
+      icon="lightbulb"
+      href="/concepts/presets"
+    >
+      Understand presets, package managers, and configuration
+    </Card>
+    <Card
+      title="Commands"
+      icon="terminal"
+      href="/commands/install"
+    >
+      Master all PM-Auto commands and options
+    </Card>
+    <Card
+      title="Creating presets"
+      icon="wrench"
+      href="/guides/creating-presets"
+    >
+      Learn how to create powerful presets for your workflows
+    </Card>
+    <Card
+      title="Examples"
+      icon="code"
+      href="/guides/examples"
+    >
+      See real-world preset examples for common tech stacks
+    </Card>
+  </CardGroup>
+</div>
 
-## Create beautiful pages
+{/* Key Features */}
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Why PM-Auto?</h2>
+  <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">Save time and streamline your development workflow</p>
+  
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="bg-white dark:bg-[#1a1d27] border border-gray-200 dark:border-[#27272a] rounded-lg p-6">
+      <div className="text-[#3B82F6] mb-3">
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      </div>
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">One command installs</h3>
+      <p className="text-gray-600 dark:text-gray-400">Replace dozens of install commands with a single `pm-auto install` command.</p>
+    </div>
+    
+    <div className="bg-white dark:bg-[#1a1d27] border border-gray-200 dark:border-[#27272a] rounded-lg p-6">
+      <div className="text-[#3B82F6] mb-3">
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+        </svg>
+      </div>
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Reusable presets</h3>
+      <p className="text-gray-600 dark:text-gray-400">Define your tech stack once and reuse it across all your projects.</p>
+    </div>
+    
+    <div className="bg-white dark:bg-[#1a1d27] border border-gray-200 dark:border-[#27272a] rounded-lg p-6">
+      <div className="text-[#3B82F6] mb-3">
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Multi-package manager</h3>
+      <p className="text-gray-600 dark:text-gray-400">Works with npm, pnpm, yarn, and bun - use your preferred tool.</p>
+    </div>
+    
+    <div className="bg-white dark:bg-[#1a1d27] border border-gray-200 dark:border-[#27272a] rounded-lg p-6">
+      <div className="text-[#3B82F6] mb-3">
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </div>
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Powerful configuration</h3>
+      <p className="text-gray-600 dark:text-gray-400">Version pinning, custom flags, and interactive command support.</p>
+    </div>
+  </div>
+</div>
 
-Everything you need to create world-class documentation.
+{/* Resources */}
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Resources</h2>
+  <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">Additional resources to help you succeed</p>
+  
+  <CardGroup cols={3}>
+    <Card
+      title="Configuration schema"
+      icon="file-code"
+      href="/reference/config-schema"
+    >
+      Complete reference for config file structure
+    </Card>
+    <Card
+      title="Troubleshooting"
+      icon="circle-question"
+      href="/reference/troubleshooting"
+    >
+      Common issues and solutions
+    </Card>
+    <Card
+      title="Best practices"
+      icon="star"
+      href="/guides/best-practices"
+    >
+      Tips for creating effective presets
+    </Card>
+  </CardGroup>
+</div>
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+{/* Closing CTA */}
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <div className="bg-gradient-to-r from-[#3B82F6] to-[#1E40AF] rounded-2xl p-8 sm:p-12 text-center">
+    <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to streamline your workflow?</h2>
+    <p className="text-lg text-white/90 mb-6 max-w-2xl mx-auto">
+      Install PM-Auto and start installing your entire tech stack with a single command
+    </p>
+    <a 
+      href="/installation" 
+      className="inline-flex items-center px-8 py-3 rounded-lg bg-white text-[#3B82F6] hover:bg-gray-100 font-semibold transition-colors"
+    >
+      Install PM-Auto
+      <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+      </svg>
+    </a>
+  </div>
+</div>

@@ -1,0 +1,249 @@
+---
+title: Configuration schema
+description: Complete reference for PM-Auto configuration file structure and validation rules
+---
+
+The PM-Auto configuration file defines reusable package presets that you can install with a single command. This page documents the complete schema, field types, and validation rules.
+
+## Configuration file format
+
+PM-Auto uses a JSON configuration file where each top-level key represents a preset. You register the config path with:
+
+```bash
+pm-auto config ./config.json
+```
+
+## Schema overview
+
+The configuration file is a JSON object where each key is a preset identifier, and each value conforms to the `ConfigType` interface.
+
+### TypeScript interfaces
+
+```typescript
+interface ConfigType {
+  presetName: string;
+  description?: string;
+  packageManager: string;
+  packages: PackageType[];
+}
+
+interface PackageType {
+  command: string;
+  interactive: boolean;
+  dev?: boolean;
+  flags?: string[];
+  version?: string;
+}
+```
+
+## Preset-level fields
+
+Each preset in your configuration must include these fields:
+
+<ParamField path="presetName" type="string" required>
+  The name you use to reference this preset in CLI commands. Must match the parent key in the JSON structure.
+  
+  ```bash
+  pm-auto install <presetName>
+  ```
+</ParamField>
+
+<ParamField path="description" type="string">
+  Human-readable description of what this preset installs. Displayed in `pm-auto list` and `pm-auto describe` commands.
+</ParamField>
+
+<ParamField path="packageManager" type="string" required>
+  The package manager to use for all installations in this preset.
+  
+  **Valid values:**
+  - `npm`
+  - `pnpm`
+  - `yarn`
+  - `bun`
+  
+  PM-Auto will execute all commands using the specified package manager's syntax.
+</ParamField>
+
+<ParamField path="packages" type="array" required>
+  Ordered list of packages to install. PM-Auto executes these commands sequentially in the order defined.
+  
+  Each item must be a `PackageType` object (see package-level fields below).
+</ParamField>
+
+## Package-level fields
+
+Each object in the `packages` array represents a single install command:
+
+<ParamField path="command" type="string" required>
+  The package name or CLI tool to install. Can be:
+  - A single package: `"react"`
+  - Multiple packages: `"react react-dom"`
+  - A scoped package: `"@types/node"`
+  - An executable tool: `"create-next-app"`
+</ParamField>
+
+<ParamField path="interactive" type="boolean" required>
+  Indicates whether this command prompts for user input during installation.
+  
+  **Set to `true` for:**
+  - `create-next-app`
+  - `shadcn init`
+  - Any tool that requires interactive prompts
+  
+  **Set to `false` for:**
+  - Standard package installations
+  - Non-interactive commands
+  
+  <Warning>
+    If you set `interactive: false` for a command that prompts for input, the installation will hang indefinitely.
+  </Warning>
+</ParamField>
+
+<ParamField path="dev" type="boolean" default="false">
+  Install as a development dependency.
+  
+  - `true`: Adds `-D` or `--save-dev` flag
+  - `false` or omitted: Installs as regular dependency
+  
+  **Example output:**
+  ```bash
+  npm install typescript -D
+  ```
+</ParamField>
+
+<ParamField path="version" type="string">
+  Specific version to install. Can be:
+  - Exact version: `"3.11.4"`
+  - Version range: `"^5.0.0"`
+  - Tag: `"latest"` or `"next"`
+  
+  If omitted, installs the latest stable version.
+  
+  **Example output:**
+  ```bash
+  npm install gsap@3.11.4
+  ```
+</ParamField>
+
+<ParamField path="flags" type="string[]">
+  Additional CLI flags or arguments to append to the install command.
+  
+  **Examples:**
+  - `["."]` - Install in current directory
+  - `["init"]` - Run init command
+  - `["--peer-deps"]` - Include peer dependencies
+  - `["--legacy-peer-deps"]` - Use legacy peer deps resolution
+  
+  Flags are appended in the order specified.
+</ParamField>
+
+## Validation rules
+
+PM-Auto validates your configuration when you run commands:
+
+1. **Required fields**: `presetName`, `packageManager`, and `packages` must be present
+2. **Package manager**: Must be one of: `npm`, `pnpm`, `yarn`, or `bun`
+3. **Packages array**: Must contain at least one package entry
+4. **Package fields**: Each package must have `command` and `interactive` fields
+5. **JSON syntax**: File must be valid JSON (no trailing commas, comments must be removed)
+
+<Warning>
+  Always re-register your config path after making changes:
+  ```bash
+  pm-auto config ./config.json
+  ```
+</Warning>
+
+## Complete example
+
+Here's a comprehensive example showing all available fields:
+
+```json
+{
+  "fullstack-app": {
+    "presetName": "fullstack-app",
+    "description": "Complete Next.js fullstack setup with TypeScript and UI tools",
+    "packageManager": "bun",
+    "packages": [
+      {
+        "command": "create-next-app",
+        "interactive": true,
+        "dev": false,
+        "version": "latest",
+        "flags": ["."]
+      },
+      {
+        "command": "shadcn",
+        "interactive": true,
+        "dev": false,
+        "version": "latest",
+        "flags": ["init"]
+      },
+      {
+        "command": "gsap",
+        "interactive": false,
+        "dev": false,
+        "version": "3.11.4",
+        "flags": ["--peer-deps"]
+      },
+      {
+        "command": "@react-three/fiber",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "clsx tailwind-merge",
+        "interactive": false,
+        "dev": false
+      },
+      {
+        "command": "@types/three",
+        "interactive": false,
+        "dev": true
+      }
+    ]
+  },
+  "express-api": {
+    "presetName": "express-api",
+    "description": "Express TypeScript API backend",
+    "packageManager": "npm",
+    "packages": [
+      {
+        "command": "express dotenv cors helmet",
+        "interactive": false
+      },
+      {
+        "command": "typescript ts-node @types/node @types/express",
+        "interactive": false,
+        "dev": true
+      }
+    ]
+  }
+}
+```
+
+## Command generation
+
+PM-Auto constructs install commands based on your configuration:
+
+**Input configuration:**
+```json
+{
+  "command": "gsap",
+  "interactive": false,
+  "dev": true,
+  "version": "3.11.4",
+  "flags": ["--peer-deps"]
+}
+```
+
+**Generated command:**
+```bash
+npm install gsap@3.11.4 -D --peer-deps
+```
+
+## Related commands
+
+- [Install command](/commands/install) - Install packages from a preset
+- [Config command](/commands/config) - Set config file path
+- [Describe command](/commands/describe) - View preset details

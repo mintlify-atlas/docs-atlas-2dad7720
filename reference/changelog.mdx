@@ -1,0 +1,149 @@
+---
+title: Changelog
+description: Version history and release notes for PM-Auto
+---
+
+Track updates, new features, and bug fixes across PM-Auto releases.
+
+## Current version
+
+### 1.0.8 (Latest)
+
+Current stable release of PM-Auto with core features:
+
+**Features:**
+- Define reusable package presets in JSON configuration
+- Support for npm, pnpm, yarn, and bun package managers
+- Interactive and non-interactive command handling
+- Install and uninstall presets with single commands
+- Dry-run mode for previewing commands
+- List and describe presets
+- Config path management
+- Custom flags and version specification per package
+- Development dependency support
+
+**Commands:**
+- `pm-auto install` - Install preset packages
+- `pm-auto uninstall` - Remove preset packages
+- `pm-auto list` - List all presets
+- `pm-auto describe` - Show preset details
+- `pm-auto config` - Set config file path
+- `pm-auto config-path` - Show current config path
+
+## Check your version
+
+To check which version of PM-Auto you have installed:
+
+```bash
+pm-auto -V
+```
+
+Or view full version info:
+
+```bash
+pm-auto --version
+```
+
+## Update PM-Auto
+
+To update to the latest version:
+
+<CodeGroup>
+
+```bash npm
+npm update -g pm-auto
+```
+
+```bash pnpm
+pnpm update -g pm-auto
+```
+
+```bash yarn
+yarn global upgrade pm-auto
+```
+
+```bash bun
+bun update -g pm-auto
+```
+
+</CodeGroup>
+
+Verify the update:
+
+```bash
+pm-auto -V
+```
+
+## Release history
+
+For detailed release notes and historical versions, visit:
+
+<Card title="GitHub Releases" icon="github" href="https://github.com/yourusername/pm-auto/releases">
+  View all releases, download specific versions, and see detailed changelogs
+</Card>
+
+## Breaking changes
+
+<Warning>
+  Currently there are no documented breaking changes between versions. Future breaking changes will be clearly marked here.
+</Warning>
+
+## Upgrade guide
+
+When upgrading PM-Auto:
+
+1. **Check the release notes** for any breaking changes
+2. **Update globally:**
+   ```bash
+   npm update -g pm-auto
+   ```
+3. **Verify your config still works:**
+   ```bash
+   pm-auto list
+   ```
+4. **Test with dry-run:**
+   ```bash
+   pm-auto install <preset-name> --dry-run
+   ```
+
+## Roadmap
+
+Upcoming features being considered:
+
+- Plugin system for custom package managers
+- Config validation command
+- Template presets library
+- Multi-config support
+- Interactive preset builder
+
+<Note>
+  Feature requests and suggestions are welcome on [GitHub Issues](https://github.com/yourusername/pm-auto/issues).
+</Note>
+
+## Version support
+
+**Supported versions:**
+- 1.0.x - Current stable release (actively maintained)
+
+**Requirements:**
+- Node.js 14 or higher
+- One of: npm, pnpm, yarn 2+, or bun
+
+## Stay updated
+
+To stay informed about new releases:
+
+1. **Watch the repository** on GitHub for release notifications
+2. **Check this changelog** before updating
+3. **Review migration guides** for major version updates
+
+## Previous versions
+
+<Accordion title="View older versions">
+  Detailed changelogs for versions prior to 1.0.8 are available on the [GitHub Releases page](https://github.com/yourusername/pm-auto/releases).
+  
+  To install a specific version:
+  ```bash
+  npm install -g pm-auto@1.0.7
+  ```
+</Accordion>

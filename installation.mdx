@@ -1,0 +1,82 @@
+---
+title: Installation
+description: Install PM-Auto globally on your system and verify it's working correctly.
+---
+
+## Install PM-Auto
+
+Install PM-Auto globally using your preferred package manager:
+
+<CodeGroup>
+
+```bash npm
+npm install -g pm-auto
+```
+
+```bash pnpm
+pnpm add -g pm-auto
+```
+
+```bash yarn
+yarn global add pm-auto
+```
+
+```bash bun
+bun add -g pm-auto
+```
+
+</CodeGroup>
+
+The `-g` (or `global`) flag ensures PM-Auto is available system-wide, so you can use it in any directory.
+
+## Verify installation
+
+Check that PM-Auto is installed correctly by running:
+
+```bash
+pm-auto -V
+```
+
+You should see the version number:
+
+```bash
+1.0.8
+```
+
+You can also run `pm-auto --help` to see all available commands:
+
+```bash
+pm-auto --help
+```
+
+## System requirements
+
+<Note>
+  PM-Auto requires **Node.js 14 or higher** and at least one package manager (npm, pnpm, yarn, or bun) installed on your system.
+</Note>
+
+PM-Auto works on:
+
+- macOS
+- Linux
+- Windows (via WSL or native)
+
+## What gets installed
+
+When you install PM-Auto globally, you get:
+
+- The `pm-auto` CLI command
+- All dependencies bundled with the tool
+- A configuration system that stores your preset definitions
+
+<Warning>
+  PM-Auto stores your config file path in a local file. If you move your config file, you'll need to re-register the path using `pm-auto config <new-path>`.
+</Warning>
+
+## Next steps
+
+Now that PM-Auto is installed, you're ready to create your first preset.
+
+<Card title="Quick start" icon="rocket" href="/quickstart">
+  Create and install your first preset in under 5 minutes
+</Card>
