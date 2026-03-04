@@ -1,0 +1,75 @@
+{
+  "projectType": "cli-tool",
+  "projectName": "PM-Auto",
+  "projectDescription": "A CLI tool to define and install your tech stack presets with one command",
+  "theme": "aspen",
+  "primaryColor": "#3B82F6",
+  "lightColor": "#60A5FA",
+  "darkColor": "#1E40AF",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get Started",
+        "pages": [
+          "introduction",
+          "installation",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "Core Concepts",
+        "pages": [
+          "concepts/presets",
+          "concepts/package-managers",
+          "concepts/configuration"
+        ]
+      },
+      {
+        "group": "Commands",
+        "pages": [
+          "commands/install",
+          "commands/uninstall",
+          "commands/list",
+          "commands/describe",
+          "commands/config",
+          "commands/config-path"
+        ]
+      },
+      {
+        "group": "Guides",
+        "pages": [
+          "guides/creating-presets",
+          "guides/examples",
+          "guides/best-practices"
+        ]
+      },
+      {
+        "group": "Reference",
+        "pages": [
+          "reference/config-schema",
+          "reference/troubleshooting",
+          "reference/changelog"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Define reusable package presets in JSON config files",
+    "Install entire tech stacks with a single command",
+    "Support for npm, pnpm, yarn, and bun package managers",
+    "Handle both interactive and non-interactive package installations",
+    "Dry-run mode to preview commands before execution",
+    "Version pinning and custom flags support",
+    "Command aliases for faster workflow"
+  ],
+  "publicApiSurface": [
+    "pm-auto install [presets...] - Install package presets",
+    "pm-auto uninstall <presets...> - Remove packages from presets",
+    "pm-auto list - List all available presets",
+    "pm-auto describe <preset> - Show preset details",
+    "pm-auto config <path> - Set configuration file path",
+    "pm-auto config-path - Display current config path",
+    "--dry-run flag - Preview commands without executing",
+    "--add-flags flag - Append custom flags to install commands"
+  ]
+}
